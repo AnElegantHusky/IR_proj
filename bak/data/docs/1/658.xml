@@ -1,5 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<doc><id>658</id><url>https://docs.python.org/zh-cn/3/library/internet.html</url><title>互联网协议和支持</title><body>本章介绍的模块实现了互联网协议并支持相关技术。 它们都是用 Python 实现的。 这些模块中的大多数都需要存在依赖于系统的模块 socket ，目前大多数流行平台都支持它。 这是一个概述：
-xml.parsers.expat --- Fast XML parsing using Expat
-webbrowser --- 方便的Web浏览器控制器
-</body></doc>

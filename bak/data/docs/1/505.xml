@@ -1,5 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<doc><id>505</id><url>https://docs.python.org/zh-cn/3/library/superseded.html</url><title>被取代的模块</title><body>本章中描述的模块均已弃用，仅保留用于向后兼容。 它们已经被其他模块所取代。
-Unix syslog 库例程
-optparse --- 解析器的命令行选项
-</body></doc>

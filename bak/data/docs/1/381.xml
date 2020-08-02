@@ -1,8 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<doc><id>381</id><url>https://docs.python.org/zh-cn/3/c-api/iter.html</url><title>迭代器协议</title><body>迭代器有两个函数。
-返回 true ， 如果对象 o 支持迭代器协议的话。
-返回迭代 o 的下一个值。 对象必须是一个迭代器（这应由调用者来判断）。 如果没有余下的值，则返回 NULL 并且不设置异常。 如果在获取条目时发生了错误，则返回 NULL 并且传递异常。
-要为迭代器编写一个一个循环，C代码应该看起来像这样
-映射协议
-缓冲协议
-</body></doc>

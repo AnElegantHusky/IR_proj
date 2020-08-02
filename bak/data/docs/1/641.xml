@@ -1,6 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<doc><id>641</id><url>https://docs.python.org/zh-cn/3/library/custominterp.html</url><title>自定义 Python 解释器</title><body>本章中描述的模块允许编写类似于 Python 的交互式解释器的接口。 如果你想要一个支持附加一些特殊功能到 Python 语言的 Python 解释器，你应该看看 code 模块。 （ codeop 模块是低层级的，用于支持编译可能不完整的 Python 代码块。）
-本章描述的完整模块列表如下：
-site —— 指定域的配置钩子
-code --- 解释器基类
-</body></doc>

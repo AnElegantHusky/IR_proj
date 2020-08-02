@@ -1,7 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<doc><id>656</id><url>https://docs.python.org/zh-cn/3/c-api/none.html</url><title> 对象</title><body>请注意， None 的 PyTypeObject 不会直接在 Python / C API 中公开。 由于 None 是单例，测试对象标识（在C中使用 == ）就足够了。 由于同样的原因，没有 PyNone_Check() 函数。
-Python None 对象，表示缺乏值。 这个对象没有方法。 它需要像引用计数一样处理任何其他对象。
-正确处理来自C函数内的 Py_None 返回（也就是说，增加 None 的引用计数并返回它。）
-类型对象
-整数型对象
-</body></doc>

@@ -1,6 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<doc><id>415</id><url>https://docs.python.org/zh-cn/3/library/frameworks.html</url><title>程序框架</title><body>本章中描述的模块是很大程度上决定程序结构的框架。 目前，这里描述的模块都面向编写命令行接口。
-本章描述的完整模块列表如下：
-locale --- 国际化服务
-turtle --- 海龟绘图
-</body></doc>

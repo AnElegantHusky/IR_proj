@@ -1,5 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<doc><id>497</id><url>https://docs.python.org/zh-cn/3/library/allos.html</url><title>通用操作系统服务</title><body>本章中描述的各模块提供了在（几乎）所有的操作系统上可用的操作系统特性的接口，例如文件和时钟。这些接口通常以 Unix 或 C 接口为参考对象，不过在大多数其他系统上也可用。这里有一个概述：
-secrets --- 生成安全随机数字用于管理密码
-os --- 多种操作系统接口
-</body></doc>

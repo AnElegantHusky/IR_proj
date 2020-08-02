@@ -2550,7 +2550,7 @@
             <entry file="file://$PROJECT_DIR$/web/templates/content.html">
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="180">
-                  <caret line="10" column="10" lean-forward="true" selection-start-line="10" selection-start-column="10" selection-end-line="10" selection-end-column="10" />
+                  <caret line="10" column="10" selection-start-line="10" selection-start-column="10" selection-end-line="10" selection-end-column="10" />
                 </state>
               </provider>
             </entry>
@@ -2629,7 +2629,7 @@
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
+  <component name="ProjectFrameBounds" extendedState="7">
     <option name="x" value="952" />
     <option name="width" value="975" />
     <option name="height" value="1047" />
@@ -2646,11 +2646,6 @@
             <path>
               <item name="IR_proj" type="b2602c69:ProjectViewProjectNode" />
               <item name="IR_proj" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="IR_proj" type="b2602c69:ProjectViewProjectNode" />
-              <item name="IR_proj" type="462c0819:PsiDirectoryNode" />
-              <item name="code" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="IR_proj" type="b2602c69:ProjectViewProjectNode" />
@@ -2809,7 +2804,7 @@
       <workItem from="1596252805571" duration="671000" />
       <workItem from="1596253498681" duration="5680000" />
       <workItem from="1596271334260" duration="8917000" />
-      <workItem from="1596331380213" duration="14393000" />
+      <workItem from="1596331380213" duration="14694000" />
     </task>
     <task id="LOCAL-00001" summary="jj">
       <created>1596028721472</created>
@@ -2822,7 +2817,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="61939000" />
+    <option name="totallyTimeSpent" value="62240000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -2834,10 +2829,9 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
-    <editor active="true" />
+    <frame x="-8" y="-8" width="1936" height="1056" extended-state="7" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.15671642" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.15671642" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32936078" />
@@ -2851,7 +2845,7 @@
       <window_info anchor="bottom" id="Version Control" order="9" />
       <window_info anchor="bottom" id="Favorites" order="10" weight="0.32936078" />
       <window_info anchor="bottom" id="Database Changes" order="11" weight="0.32822758" />
-      <window_info anchor="bottom" id="Terminal" order="12" visible="true" weight="0.3846154" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="12" visible="true" weight="0.3846154" />
       <window_info anchor="bottom" id="Event Log" order="13" side_tool="true" />
       <window_info anchor="bottom" id="Python Console" order="14" weight="0.3249453" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
@@ -3206,7 +3200,7 @@
     <entry file="file://$PROJECT_DIR$/web/templates/content.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="180">
-          <caret line="10" column="10" lean-forward="true" selection-start-line="10" selection-start-column="10" selection-end-line="10" selection-end-column="10" />
+          <caret line="10" column="10" selection-start-line="10" selection-start-column="10" selection-end-line="10" selection-end-column="10" />
         </state>
       </provider>
     </entry>

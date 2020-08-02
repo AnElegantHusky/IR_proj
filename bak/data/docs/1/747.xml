@@ -1,9 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<doc><id>747</id><url>https://docs.python.org/zh-cn/3/c-api/concrete.html</url><title>具体的对象层</title><body>本章中的函数特定于某些 Python 对象类型。 将错误类型的对象传递给它们并不是一个好主意；如果您从 Python 程序接收到一个对象，但不确定它是否具有正确的类型，则必须首先执行类型检查；例如，要检查对象是否为字典，请使用 PyDict_Check()。 本章的结构类似于 Python 对象类型的“家族树”。
-警告
-虽然本章所描述的函数会仔细检查传入对象的类型，但是其中许多函数不会检查传入的对象是否为 NULL。 允许传入 NULL 可能导致内存访问冲突和解释器的立即终止。
-本节描述Python类型对象和单一实例对象 象None。
-序列对象的一般操作在前一章中讨论过;本节介绍Python语言固有的特定类型的序列对象。
-旧缓冲协议
-类型对象
-</body></doc>

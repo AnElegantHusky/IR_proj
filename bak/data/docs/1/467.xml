@@ -1,6 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<doc><id>467</id><url>https://docs.python.org/zh-cn/3/c-api/abstract.html</url><title>抽象对象层</title><body>本章中的函数与 Python对象交互，无论其类型，或具有广泛类的对象类型（例如，所有数值类型，或所有序列类型）。当使用对象类型并不适用时，他们会产生一个 Python 异常。
-这些函数是不可能用于未正确初始化的对象的，如一个列表对象被 PyList_New() 创建，但其中的项目没有被设置为一些非``NULL``的值。
-编解码器注册与支持功能
-对象协议
-</body></doc>

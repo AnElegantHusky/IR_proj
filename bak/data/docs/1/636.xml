@@ -1,5 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<doc><id>636</id><url>https://docs.python.org/zh-cn/3/reference/index.html</url><title>Python语言参考</title><body>本参考手册描述了 Python 的语法和“核心语义”。本参考是简洁的，但试图做到准确和完整。 非必要的内建对象类型和内建函数、模块的语义描述在 Python 标准库 中。有关该语言的非正式介绍，请参阅 Python 教程 。对 C 或 C++ 程序员，还有两个额外的手册： 扩展和嵌入 Python 解释器 概述了如何编写一个 Python 扩展模块，Python/C API 参考手册 详细介绍了 C/C++ 中可用的接口。
-5. 编辑器和集成开发环境
-1. 概述
-</body></doc>

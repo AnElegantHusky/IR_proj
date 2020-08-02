@@ -1,5 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<doc><id>672</id><url>https://docs.python.org/zh-cn/3/c-api/utilities.html</url><title>工具</title><body>本章中的函数执行各种实用工具任务，包括帮助 C 代码提升跨平台可移植性，在 C 中使用 Python 模块，以及解析函数参数并根据 C 中的值构建 Python 中的值等等。
-异常处理
-操作系统实用程序
-</body></doc>

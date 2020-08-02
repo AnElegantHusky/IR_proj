@@ -1,6 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<doc><id>339</id><url>https://docs.python.org/zh-cn/3/library/modules.html</url><title>导入模块</title><body>本章中介绍的模块提供了导入其他Python模块和挂钩以自定义导入过程的新方法。
-本章描述的完整模块列表如下：
-codeop --- 编译Python代码
-zipimport --- 从 Zip 存档中导入模块
-</body></doc>

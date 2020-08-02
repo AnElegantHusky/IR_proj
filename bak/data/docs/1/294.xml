@@ -1,8 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<doc><id>294</id><url>https://docs.python.org/zh-cn/3/library/_dummy_thread.html</url><title> --- </title><body>源代码： Lib/_dummy_thread.py
-3.7 版后已移除: Python 现在总是会启用多线程。请改用 _thread (或者用 threading 更好)。
-这个模块提供与 _thread 相同的接口。它主要用于在没有提供 _thread 模块的平台上被导入。
-如果线程需要阻塞等待另一个线程被创建的话，可能会造成死锁，这通常是由于阻塞 I/O 引起的。这种场景下请不要使用这个模块。
-_thread --- 底层多线程 API
-dummy_threading ---  可直接替代 threading 模块。
-</body></doc>

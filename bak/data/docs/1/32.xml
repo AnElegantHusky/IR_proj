@@ -1,5 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<doc><id>32</id><url>https://docs.python.org/zh-cn/3/reference/grammar.html</url><title>完整的语法规范</title><body>这是完整的Python语法，它被送入解析器生成器，以生成解析Python源文件的解析器：
-9. 最高层级组件
-Python 标准库
-</body></doc>
