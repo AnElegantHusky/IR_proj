@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='utf-8'?>
+<doc><id>231</id><url>https://docs.python.org/zh-cn/3/library/colorsys.html</url><title> --- 颜色系统间的转换</title><body>源代码： Lib/colorsys.py
+colorsys 模块定义了计算机显示器所用的 RGB (Red Green Blue) 色彩空间与三种其他色彩坐标系统 YIQ, HLS (Hue Lightness Saturation) 和 HSV (Hue Saturation Value) 表示的颜色值之间的双向转换。 所有这些色彩空间的坐标都使用浮点数值来表示。 在 YIQ 空间中，Y 坐标取值为 0 和 1 之间，而 I 和 Q 坐标均可以为正数或负数。 在所有其他空间中，坐标取值均为 0 和 1 之间。
+参见
+有关色彩空间的更多信息可访问 http://poynton.ca/ColorFAQ.html 和 https://www.cambridgeincolour.com/tutorials/color-spaces.htm.
+colorsys 模块定义了如下函数：
+把颜色从RGB值转为YIQ值。
+把颜色从YIQ值转为RGB值。
+把颜色从RGB值转为HLS值。
+把颜色从HLS值转为RGB值。
+把颜色从RGB值转为HSV值。
+把颜色从HSV值转为RGB值。
+示例:
+chunk --- 读取 IFF 分块数据
+imghdr --- 推测图像类型
+</body></doc>

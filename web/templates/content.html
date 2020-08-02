@@ -6,7 +6,7 @@
 <body>
     <div id="basic" align="center">
         <h1>{{doc.title}}</h1>
-        <p>{{doc.datetime}}</p>
+{#        <p>{{doc.datetime}}</p>#}
         <p><a href="{{doc.url}}" target="_blank">{{doc.url}}</a></p>
     </div>
     <hr/>
@@ -18,17 +18,5 @@
         </table>
     </div>
     <hr/>
-    <div align="center">
-        <table width="1000" border="0">
-            <tr>
-                <td style="width:1000px"><h2>推荐阅读</h2></td>
-            </tr>
-            {% for each in doc.extra %}
-            <tr>
-                <td style="width:1000px"><a href="/search/{{each.id}}/" target="_blank">{{each.title}}</a></td>
-            </tr>
-            {% endfor %}
-        </table>
-    </div>
 </body>
 </html>

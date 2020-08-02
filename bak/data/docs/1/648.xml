@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<doc><id>648</id><url>https://docs.python.org/zh-cn/3/library/tk.html</url><title>Tk图形用户界面(GUI)</title><body>Tcl/Tk集成到Python中已经有一些年头了。Python程序员可以通过 tkinter 包和它的扩展， tkinter.tix 模块和 tkinter.ttk 模块，来使用这套鲁棒的、平台无关的窗口工具集。
+tkinter 包使用面向对象的方式对Tcl/Tk进行了一层薄包装。使用 tkinter ，你不需要写Tcl代码，但可能需要参考Tk文档，甚至Tcl文档。 tkinter 使用Python类，对Tk的窗体小部件（Widgets）进行了一系列的封装。除此之外，内部模块 _tkinter 针对Python和Tcl之间的交互，提供了一套线程安全的机制。
+tkinter 最大的优点就一个字：快，再一个，是Python自带的。尽管官方文档不太完整，但有其他资源可以参考，比如Tk手册，教程等。 tkinter 也以比较过时的外观为人所知，但在Tk 8.5中，这一点得到了极大的改观。除此之外，如果有兴趣，还有其他的一些GUI库可供使用。更多信息，请参考 其他图形用户界面（GUI）包  小节。
+shlex --- Simple lexical analysis
+tkinter --- Tcl/Tk的Python接口
+</body></doc>

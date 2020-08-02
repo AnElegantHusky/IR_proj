@@ -1,0 +1,5 @@
+<?xml version='1.0' encoding='utf-8'?>
+<doc><id>724</id><url>https://docs.python.org/zh-cn/3/c-api/index.html</url><title>Python/C API 参考手册</title><body>本手册描述了希望编写扩展模块并将 Python 解释器嵌入其应用程序中的 C 和 C++ 程序员可用的 API。同时可以参阅 扩展和嵌入 Python 解释器 ，其中描述了扩展编写的一般原则，但没有详细描述 API 函数。
+1. 在其它应用程序嵌入 Python
+概述
+</body></doc>

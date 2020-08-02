@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='utf-8'?>
+<doc><id>122</id><url>https://docs.python.org/zh-cn/3/library/keyword.html</url><title> --- 检验Python关键字</title><body>源码： Lib/keyword.py
+此模块允许 Python 程序确定某个字符串是否为 关键字。
+如果 s 是一个 Python 关键字 则返回 True。
+包含解释器定义的所有 关键字 的序列。 如果所定义的任何关键字仅在特定 __future__ 语句生效时被激活，它们也将被包含在内。
+token --- 与Python解析树一起使用的常量
+tokenize --- 对 Python 代码使用的标记解析器
+</body></doc>

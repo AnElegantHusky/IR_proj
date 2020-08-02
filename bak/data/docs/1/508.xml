@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='utf-8'?>
+<doc><id>508</id><url>https://docs.python.org/zh-cn/3/c-api/reflection.html</url><title>反射</title><body>返回当前执行帧中内置函数的字典，如果当前没有帧正在执行，则返回线程状态的解释器。
+返回当前执行帧中局部变量的字典，如果没有当前执行的帧则返回 NULL。
+返回当前执行帧中全局变量的字典，如果没有当前执行的帧则返回 NULL。
+返回当前线程状态的帧，如果没有当前执行的帧则返回 NULL。
+返回 frame 当前正在执行的行号。
+如果 func 是函数、类或实例对象，则返回它的名称，否则返回 func 的类型的名称。
+根据 func 的类型返回描述字符串。 返回值包括函数和方法的 "()", " constructor", " instance" 和 " object"。 与 PyEval_GetFuncName() 的结果连接，结果将是 func 的描述。
+字符串转换与格式化
+编解码器注册与支持功能
+</body></doc>

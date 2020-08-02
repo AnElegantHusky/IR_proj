@@ -1,0 +1,547 @@
+<?xml version='1.0' encoding='utf-8'?>
+<doc><id>490</id><url>https://docs.python.org/zh-cn/3/library/xml.etree.elementtree.html</url><title> ---  ElementTree XML API</title><body>源代码： Lib/xml/etree/ElementTree.py
+xml.etree.ElementTree 模块实现了一个简单高效的API，用于解析和创建XML数据。
+在 3.3 版更改: 只要有可能，这个模块将使用快速实现。xml.etree.cElementTree 模块已弃用。
+警告
+xml.etree.ElementTree 模块对于恶意构建的数据是不安全的。如果需要解析不可信或未经身份验证的数据，请参见 XML 漏洞 。
+这是一个使用 xml.etree.ElementTree （简称 ET ）的简短教程。目标是演示模块的一些构建块和基本概念。
+XML是一种固有的分层数据格式，最自然的表示方法是使用树。为此， ET 有两个类： ElementTree 将整个XML文档表示为一个树， Element 表示该树中的单个节点。与整个文档的交互（读写文件）通常在 ElementTree 级别完成。与单个XML元素及其子元素的交互是在 Element 级别完成的。
+我们将使用以下XML文档作为本节的示例数据：
+可以通过从文件中读取来导入此数据：
+或直接从字符串中解析：
+fromstring() 将XML从字符串直接解析为 Element ，该元素是已解析树的根元素。其他解析函数可能会创建一个 ElementTree 。确切信息请查阅文档。
+作为 Element ， root 具有标签和属性字典:
+还有可以迭代的子节点：
+子级是可以嵌套的，我们可以通过索引访问特定的子级节点：
+注解
+并非XML输入的所有元素都将作为解析树的元素结束。目前，此模块跳过输入中的任何XML注释、处理指令和文档类型声明。然而，使用这个模块的API而不是从XML文本解析构建的树可以包含注释和处理指令，生成XML输出时同样包含这些注释和处理指令。可以通过将自定义 TreeBuilder 实例传递给 XMLParser 构造函数来访问文档类型声明。
+Most parsing functions provided by this module require the whole document
+to be read at once before returning any result.  It is possible to use an
+XMLParser and feed data into it incrementally, but it is a push API that
+calls methods on a callback target, which is too low-level and inconvenient for
+most needs.  Sometimes what the user really wants is to be able to parse XML
+incrementally, without blocking operations, while enjoying the convenience of
+fully constructed Element objects.
+The most powerful tool for doing this is XMLPullParser.  It does not
+require a blocking read to obtain the XML data, and is instead fed with data
+incrementally with XMLPullParser.feed() calls.  To get the parsed XML
+elements, call XMLPullParser.read_events().  Here is an example:
+The obvious use case is applications that operate in a non-blocking fashion
+where the XML data is being received from a socket or read incrementally from
+some storage device.  In such cases, blocking reads are unacceptable.
+Because it's so flexible, XMLPullParser can be inconvenient to use for
+simpler use-cases.  If you don't mind your application blocking on reading XML
+data but would still like to have incremental parsing capabilities, take a look
+at iterparse().  It can be useful when you're reading a large XML document
+and don't want to hold it wholly in memory.
+Element 有一些很有效的方法，可帮助递归遍历其下的所有子树（包括子级，子级的子级，等等）。例如 Element.iter():
+Element.findall() 仅查找当前元素的直接子元素中带有指定标签的元素。 Element.find() 找带有特定标签的 第一个 子级，然后可以用 Element.text 访问元素的文本内容。 Element.get 访问元素的属性:
+通过使用 XPath ，可以更精确地指定要查找的元素。
+ElementTree 提供了一种构建XML文档并将其写入文件的简单方法。调用 ElementTree.write() 方法就可以实现。
+创建后可以直接操作 Element 对象。例如：使用 Element.text 修改文本字段，使用 Element.set() 方法添加和修改属性，以及使用  Element.append() 添加新的子元素。
+假设我们要为每个国家/地区的中添加一个排名，并在排名元素中添加一个 updated 属性：
+生成的XML现在看起来像这样：
+可以使用 Element.remove() 删除元素。假设我们要删除排名高于50的所有国家/地区:
+生成的XML现在看起来像这样：
+SubElement() 函数还提供了一种便捷方法来为给定元素创建新的子元素:
+If the XML input has namespaces, tags and attributes
+with prefixes in the form prefix:sometag get expanded to
+{uri}sometag where the prefix is replaced by the full URI.
+Also, if there is a default namespace,
+that full URI gets prepended to all of the non-prefixed tags.
+Here is an XML example that incorporates two namespaces, one with the
+prefix "fictional" and the other serving as the default namespace:
+One way to search and explore this XML example is to manually add the
+URI to every tag or attribute in the xpath of a
+find() or findall():
+A better way to search the namespaced XML example is to create a
+dictionary with your own prefixes and use those in the search functions:
+These two approaches both output:
+See http://effbot.org/zone/element-index.htm for tutorials and links to other
+docs.
+This module provides limited support for
+XPath expressions for locating elements in a
+tree.  The goal is to support a small subset of the abbreviated syntax; a full
+XPath engine is outside the scope of the module.
+Here's an example that demonstrates some of the XPath capabilities of the
+module.  We'll be using the countrydata XML document from the
+Parsing XML section:
+For XML with namespaces, use the usual qualified {namespace}tag notation:
+语法
+含义
+tag
+Selects all child elements with the given tag.
+For example, spam selects all child elements
+named spam, and spam/egg selects all
+grandchildren named egg in all children named
+spam.  {namespace}* selects all tags in the
+given namespace, {*}spam selects tags named
+spam in any (or no) namespace, and {}*
+only selects tags that are not in a namespace.
+在 3.8 版更改: Support for star-wildcards was added.
+*
+选择所有子元素，包括注释和处理说明。例如 */egg 选择所有名为 egg 的孙元素。
+.
+选择当前节点。这在路径的开头非常有用，用于指示它是相对路径。
+//
+Selects all subelements, on all levels beneath the
+current  element.  For example, .//egg selects
+all egg elements in the entire tree.
+..
+Selects the parent element.  Returns None if the
+path attempts to reach the ancestors of the start
+element (the element find was called on).
+[@attrib]
+选择具有给定属性的所有元素。
+[@attrib='value']
+选择给定属性具有给定值的所有元素。该值不能包含引号。
+[tag]
+选择所有包含 tag 子元素的元素。只支持直系子元素。
+[.='text']
+选择完整文本内容等于 text 的所有元素（包括后代）。
+3.7 新版功能.
+[tag='text']
+选择所有包含名为 tag 的子元素的元素，这些子元素（包括后代）的完整文本内容等于给定的 text 。
+[position]
+Selects all elements that are located at the given
+position.  The position can be either an integer
+(1 is the first position), the expression last()
+(for the last position), or a position relative to
+the last position (e.g. last()-1).
+谓词（方括号内的表达式）之前必须带有标签名称，星号或其他谓词。position 谓词前必须有标签名称。
+C14N 2.0  转换功能。.
+Canonicalization is a way to normalise XML output in a way that allows
+byte-by-byte comparisons and digital signatures.  It reduced the freedom
+that XML serializers have and instead generates a more constrained XML
+representation.  The main restrictions regard the placement of namespace
+declarations, the ordering of attributes, and ignorable whitespace.
+This function takes an XML data string (xml_data) or a file path or
+file-like object (from_file) as input, converts it to the canonical
+form, and writes it out using the out file(-like) object, if provided,
+or returns it as a text string if not.  The output file receives text,
+not bytes.  It should therefore be opened in text mode with utf-8
+encoding.
+典型使用:
+The configuration options are as follows:
+with_comments: set to true to include comments (default: false)
+（默认值：否）
+（默认值：否）
+should be replaced in text content (default: empty)
+should be replaced in text content (default: empty)
+exclude_attrs: a set of attribute names that should not be serialised
+exclude_tags: a set of tag names that should not be serialised
+In the option list above, "a set" refers to any collection or iterable of
+strings, no ordering is expected.
+3.8 新版功能.
+Comment element factory.  This factory function creates a special element
+that will be serialized as an XML comment by the standard serializer.  The
+comment string can be either a bytestring or a Unicode string.  text is a
+string containing the comment string.  Returns an element instance
+representing a comment.
+Note that XMLParser skips over comments in the input
+instead of creating comment objects for them. An ElementTree will
+only contain comment nodes if they have been inserted into to
+the tree using one of the Element methods.
+Writes an element tree or element structure to sys.stdout.  This function
+should be used for debugging only.
+The exact output format is implementation dependent.  In this version, it's
+written as an ordinary XML file.
+elem is an element tree or an individual element.
+在 3.8 版更改: The dump() function now preserves the attribute order specified
+by the user.
+Parses an XML section from a string constant.  Same as XML().  text
+is a string containing XML data.  parser is an optional parser instance.
+If not given, the standard XMLParser parser is used.
+Returns an Element instance.
+Parses an XML document from a sequence of string fragments.  sequence is a
+list or other sequence containing XML data fragments.  parser is an
+optional parser instance.  If not given, the standard XMLParser
+parser is used.  Returns an Element instance.
+3.2 新版功能.
+Check if an object appears to be a valid element object.  element is an
+element instance.  Return True if this is an element object.
+Parses an XML section into an element tree incrementally, and reports what's
+going on to the user.  source is a filename or file object
+containing XML data.  events is a sequence of events to report back.  The
+supported events are the strings "start", "end", "comment",
+"pi", "start-ns" and "end-ns"
+(the "ns" events are used to get detailed namespace
+information).  If events is omitted, only "end" events are reported.
+parser is an optional parser instance.  If not given, the standard
+XMLParser parser is used.  parser must be a subclass of
+XMLParser and can only use the default TreeBuilder as a
+target.  Returns an iterator providing (event, elem) pairs.
+Note that while iterparse() builds the tree incrementally, it issues
+blocking reads on source (or the file it names).  As such, it's unsuitable
+for applications where blocking reads can't be made.  For fully non-blocking
+parsing, see XMLPullParser.
+注解
+iterparse() only guarantees that it has seen the "&gt;" character of a
+starting tag when it emits a "start" event, so the attributes are defined,
+but the contents of the text and tail attributes are undefined at that
+point.  The same applies to the element children; they may or may not be
+present.
+If you need a fully populated element, look for "end" events instead.
+3.4 版后已移除: parser 参数。
+在 3.8 版更改: The comment and pi events were added.
+Parses an XML section into an element tree.  source is a filename or file
+object containing XML data.  parser is an optional parser instance.  If
+not given, the standard XMLParser parser is used.  Returns an
+ElementTree instance.
+PI element factory.  This factory function creates a special element that
+will be serialized as an XML processing instruction.  target is a string
+containing the PI target.  text is a string containing the PI contents, if
+given.  Returns an element instance, representing a processing instruction.
+Note that XMLParser skips over processing instructions
+in the input instead of creating comment objects for them. An
+ElementTree will only contain processing instruction nodes if
+they have been inserted into to the tree using one of the
+Element methods.
+Registers a namespace prefix.  The registry is global, and any existing
+mapping for either the given prefix or the namespace URI will be removed.
+prefix is a namespace prefix.  uri is a namespace uri.  Tags and
+attributes in this namespace will be serialized with the given prefix, if at
+all possible.
+3.2 新版功能.
+Subelement factory.  This function creates an element instance, and appends
+it to an existing element.
+The element name, attribute names, and attribute values can be either
+bytestrings or Unicode strings.  parent is the parent element.  tag is
+the subelement name.  attrib is an optional dictionary, containing element
+attributes.  extra contains additional attributes, given as keyword
+arguments.  Returns an element instance.
+Generates a string representation of an XML element, including all
+subelements.  element is an Element instance.  encoding 1 is
+the output encoding (default is US-ASCII).  Use encoding="unicode" to
+generate a Unicode string (otherwise, a bytestring is generated).  method
+is either "xml", "html" or "text" (default is "xml").
+xml_declaration, default_namespace and short_empty_elements has the same
+meaning as in ElementTree.write(). Returns an (optionally) encoded string
+containing the XML data.
+3.4 新版功能: short_empty_elements 形参。
+3.8 新版功能: The xml_declaration and default_namespace parameters.
+在 3.8 版更改: The tostring() function now preserves the attribute order
+specified by the user.
+Generates a string representation of an XML element, including all
+subelements.  element is an Element instance.  encoding 1 is
+the output encoding (default is US-ASCII).  Use encoding="unicode" to
+generate a Unicode string (otherwise, a bytestring is generated).  method
+is either "xml", "html" or "text" (default is "xml").
+xml_declaration, default_namespace and short_empty_elements has the same
+meaning as in ElementTree.write(). Returns a list of (optionally) encoded
+strings containing the XML data. It does not guarantee any specific sequence,
+except that b"".join(tostringlist(element)) == tostring(element).
+3.2 新版功能.
+3.4 新版功能: short_empty_elements 形参。
+3.8 新版功能: The xml_declaration and default_namespace parameters.
+在 3.8 版更改: The tostringlist() function now preserves the attribute order
+specified by the user.
+Parses an XML section from a string constant.  This function can be used to
+embed "XML literals" in Python code.  text is a string containing XML
+data.  parser is an optional parser instance.  If not given, the standard
+XMLParser parser is used.  Returns an Element instance.
+Parses an XML section from a string constant, and also returns a dictionary
+which maps from element id:s to elements.  text is a string containing XML
+data.  parser is an optional parser instance.  If not given, the standard
+XMLParser parser is used.  Returns a tuple containing an
+Element instance and a dictionary.
+This module provides limited support for
+XInclude directives, via the xml.etree.ElementInclude helper module.  This module can be used to insert subtrees and text strings into element trees, based on information in the tree.
+Here's an example that demonstrates use of the XInclude module. To include an XML document in the current document, use the {http://www.w3.org/2001/XInclude}include element and set the parse attribute to "xml", and use the href attribute to specify the document to include.
+By default, the href attribute is treated as a file name. You can use custom loaders to override this behaviour. Also note that the standard helper does not support XPointer syntax.
+To process this file, load it as usual, and pass the root element to the xml.etree.ElementTree module:
+The ElementInclude module replaces the {http://www.w3.org/2001/XInclude}include element with the root element from the source.xml document. The result might look something like this:
+If the parse attribute is omitted, it defaults to "xml". The href attribute is required.
+To include a text document, use the {http://www.w3.org/2001/XInclude}include element, and set the parse attribute to "text":
+结果可能如下所示：
+Default loader. This default loader reads an included resource from disk.  href is a URL.
+parse is for parse mode either "xml" or "text".  encoding
+is an optional text encoding.  If not given, encoding is utf-8.  Returns the
+expanded resource.  If the parse mode is "xml", this is an ElementTree
+instance.  If the parse mode is "text", this is a Unicode string.  If the
+loader fails, it can return None or raise an exception.
+This function expands XInclude directives.  elem is the root element.  loader is
+an optional resource loader.  If omitted, it defaults to default_loader().
+If given, it should be a callable that implements the same interface as
+default_loader().  Returns the expanded resource.  If the parse mode is
+"xml", this is an ElementTree instance.  If the parse mode is "text",
+this is a Unicode string.  If the loader fails, it can return None or
+raise an exception.
+Element class.  This class defines the Element interface, and provides a
+reference implementation of this interface.
+The element name, attribute names, and attribute values can be either
+bytestrings or Unicode strings.  tag is the element name.  attrib is
+an optional dictionary, containing element attributes.  extra contains
+additional attributes, given as keyword arguments.
+一个标识此元素意味着何种数据的字符串(换句话说，元素类型)。
+These attributes can be used to hold additional data associated with
+the element.  Their values are usually strings but may be any
+application-specific object.  If the element is created from
+an XML file, the text attribute holds either the text between
+the element's start tag and its first child or end tag, or None, and
+the tail attribute holds either the text between the element's
+end tag and the next tag, or None.  For the XML data
+the a element has None for both text and tail attributes,
+the b element has text "1" and tail "4",
+the c element has text "2" and tail None,
+and the d element has text None and tail "3".
+To collect the inner text of an element, see itertext(), for
+example "".join(element.itertext()).
+Applications may store arbitrary objects in these attributes.
+A dictionary containing the element's attributes.  Note that while the
+attrib value is always a real mutable Python dictionary, an ElementTree
+implementation may choose to use another internal representation, and
+create the dictionary only if someone asks for it.  To take advantage of
+such implementations, use the dictionary methods below whenever possible.
+The following dictionary-like methods work on the element attributes.
+Resets an element.  This function removes all subelements, clears all
+attributes, and sets the text and tail attributes to None.
+Gets the element attribute named key.
+Returns the attribute value, or default if the attribute was not found.
+Returns the element attributes as a sequence of (name, value) pairs.  The
+attributes are returned in an arbitrary order.
+Returns the elements attribute names as a list.  The names are returned
+in an arbitrary order.
+Set the attribute key on the element to value.
+The following methods work on the element's children (subelements).
+Adds the element subelement to the end of this element's internal list
+of subelements.  Raises TypeError if subelement is not an
+Element.
+Appends subelements from a sequence object with zero or more elements.
+Raises TypeError if a subelement is not an Element.
+3.2 新版功能.
+Finds the first subelement matching match.  match may be a tag name
+or a path.  Returns an element instance
+or None.  namespaces is an optional mapping from namespace prefix
+to full name.  Pass '' as prefix to move all unprefixed tag names
+in the expression into the given namespace.
+Finds all matching subelements, by tag name or
+path.  Returns a list containing all matching
+elements in document order.  namespaces is an optional mapping from
+namespace prefix to full name.  Pass '' as prefix to move all
+unprefixed tag names in the expression into the given namespace.
+Finds text for the first subelement matching match.  match may be
+a tag name or a path.  Returns the text content
+of the first matching element, or default if no element was found.
+Note that if the matching element has no text content an empty string
+is returned. namespaces is an optional mapping from namespace prefix
+to full name.  Pass '' as prefix to move all unprefixed tag names
+in the expression into the given namespace.
+Deprecated since version 3.2, will be removed in version 3.9: Use list(elem) or iteration.
+Deprecated since version 3.2, will be removed in version 3.9: Use method Element.iter() instead.
+Inserts subelement at the given position in this element.  Raises
+TypeError if subelement is not an Element.
+Creates a tree iterator with the current element as the root.
+The iterator iterates over this element and all elements below it, in
+document (depth first) order.  If tag is not None or '*', only
+elements whose tag equals tag are returned from the iterator.  If the
+tree structure is modified during iteration, the result is undefined.
+3.2 新版功能.
+Finds all matching subelements, by tag name or
+path.  Returns an iterable yielding all
+matching elements in document order. namespaces is an optional mapping
+from namespace prefix to full name.
+3.2 新版功能.
+Creates a text iterator.  The iterator loops over this element and all
+subelements, in document order, and returns all inner text.
+3.2 新版功能.
+Creates a new element object of the same type as this element.  Do not
+call this method, use the SubElement() factory function instead.
+Removes subelement from the element.  Unlike the find* methods this
+method compares elements based on the instance identity, not on tag value
+or contents.
+Element objects also support the following sequence type methods
+for working with subelements: __delitem__(),
+__getitem__(), __setitem__(),
+__len__().
+Caution: Elements with no subelements will test as False.  This behavior
+will change in future versions.  Use specific len(elem) or elem is
+None test instead.
+Prior to Python 3.8, the serialisation order of the XML attributes of
+elements was artificially made predictable by sorting the attributes by
+their name. Based on the now guaranteed ordering of dicts, this arbitrary
+reordering was removed in Python 3.8 to preserve the order in which
+attributes were originally parsed or created by user code.
+In general, user code should try not to depend on a specific ordering of
+attributes, given that the XML Information Set explicitly excludes the attribute
+order from conveying information. Code should be prepared to deal with
+any ordering on input. In cases where deterministic XML output is required,
+e.g. for cryptographic signing or test data sets, canonical serialisation
+is available with the canonicalize() function.
+In cases where canonical output is not applicable but a specific attribute
+order is still desirable on output, code should aim for creating the
+attributes directly in the desired order, to avoid perceptual mismatches
+for readers of the code. In cases where this is difficult to achieve, a
+recipe like the following can be applied prior to serialisation to enforce
+an order independently from the Element creation:
+ElementTree wrapper class.  This class represents an entire element
+hierarchy, and adds some extra support for serialization to and from
+standard XML.
+element is the root element.  The tree is initialized with the contents
+of the XML file if given.
+Replaces the root element for this tree.  This discards the current
+contents of the tree, and replaces it with the given element.  Use with
+care.  element is an element instance.
+Same as Element.find(), starting at the root of the tree.
+Same as Element.findall(), starting at the root of the tree.
+Same as Element.findtext(), starting at the root of the tree.
+Deprecated since version 3.2, will be removed in version 3.9: Use method ElementTree.iter() instead.
+Returns the root element for this tree.
+Creates and returns a tree iterator for the root element.  The iterator
+loops over all elements in this tree, in section order.  tag is the tag
+to look for (default is to return all elements).
+Same as Element.iterfind(), starting at the root of the tree.
+3.2 新版功能.
+Loads an external XML section into this element tree.  source is a file
+name or file object.  parser is an optional parser instance.
+If not given, the standard XMLParser parser is used.  Returns the
+section root element.
+Writes the element tree to a file, as XML.  file is a file name, or a
+file object opened for writing.  encoding 1 is the output
+encoding (default is US-ASCII).
+xml_declaration controls if an XML declaration should be added to the
+file.  Use False for never, True for always, None
+for only if not US-ASCII or UTF-8 or Unicode (default is None).
+default_namespace sets the default XML namespace (for "xmlns").
+method is either "xml", "html" or "text" (default is
+"xml").
+The keyword-only short_empty_elements parameter controls the formatting
+of elements that contain no content.  If True (the default), they are
+emitted as a single self-closed tag, otherwise they are emitted as a pair
+of start/end tags.
+The output is either a string (str) or binary (bytes).
+This is controlled by the encoding argument.  If encoding is
+"unicode", the output is a string; otherwise, it's binary.  Note that
+this may conflict with the type of file if it's an open
+file object; make sure you do not try to write a string to a
+binary stream and vice versa.
+3.4 新版功能: short_empty_elements 形参。
+在 3.8 版更改: The write() method now preserves the attribute order specified
+by the user.
+This is the XML file that is going to be manipulated:
+Example of changing the attribute "target" of every link in first paragraph:
+QName wrapper.  This can be used to wrap a QName attribute value, in order
+to get proper namespace handling on output.  text_or_uri is a string
+containing the QName value, in the form {uri}local, or, if the tag argument
+is given, the URI part of a QName.  If tag is given, the first argument is
+interpreted as a URI, and this argument is interpreted as a local name.
+QName instances are opaque.
+Generic element structure builder.  This builder converts a sequence of
+start, data, end, comment and pi method calls to a well-formed element
+structure.  You can use this class to build an element structure using
+a custom XML parser, or a parser for some other XML-like format.
+element_factory, when given, must be a callable accepting two positional
+arguments: a tag and a dict of attributes.  It is expected to return a new
+element instance.
+The comment_factory and pi_factory functions, when given, should behave
+like the Comment() and ProcessingInstruction() functions to
+create comments and processing instructions.  When not given, the default
+factories will be used.  When insert_comments and/or insert_pis is true,
+comments/pis will be inserted into the tree if they appear within the root
+element (but not outside of it).
+Flushes the builder buffers, and returns the toplevel document
+element.  Returns an Element instance.
+Adds text to the current element.  data is a string.  This should be
+either a bytestring, or a Unicode string.
+Closes the current element.  tag is the element name.  Returns the
+closed element.
+Opens a new element.  tag is the element name.  attrs is a dictionary
+containing element attributes.  Returns the opened element.
+Creates a comment with the given text.  If insert_comments is true,
+this will also add it to the tree.
+3.8 新版功能.
+Creates a comment with the given target name and text.  If
+insert_pis is true, this will also add it to the tree.
+3.8 新版功能.
+In addition, a custom TreeBuilder object can provide the
+following methods:
+Handles a doctype declaration.  name is the doctype name.  pubid is
+the public identifier.  system is the system identifier.  This method
+does not exist on the default TreeBuilder class.
+3.2 新版功能.
+Is called whenever the parser encounters a new namespace declaration,
+before the start() callback for the opening element that defines it.
+prefix is '' for the default namespace and the declared
+namespace prefix name otherwise.  uri is the namespace URI.
+3.8 新版功能.
+Is called after the end() callback of an element that declared
+a namespace prefix mapping, with the name of the prefix that went
+out of scope.
+3.8 新版功能.
+A C14N 2.0 writer.  Arguments are the
+same as for the canonicalize() function.  This class does not build a
+tree but translates the callback events directly into a serialised form
+using the write function.
+3.8 新版功能.
+This class is the low-level building block of the module.  It uses
+xml.parsers.expat for efficient, event-based parsing of XML.  It can
+be fed XML data incrementally with the feed() method, and parsing
+events are translated to a push API - by invoking callbacks on the target
+object.  If target is omitted, the standard TreeBuilder is used.
+If encoding 1 is given, the value overrides the
+encoding specified in the XML file.
+在 3.8 版更改: Parameters are now keyword-only.
+The html argument no longer supported.
+Finishes feeding data to the parser.  Returns the result of calling the
+close() method of the target passed during construction; by default,
+this is the toplevel document element.
+Feeds data to the parser.  data is encoded data.
+XMLParser.feed() calls target's start(tag, attrs_dict) method
+for each opening tag, its end(tag) method for each closing tag, and data
+is processed by method data(data).  For further supported callback
+methods, see the TreeBuilder class.  XMLParser.close() calls
+target's method close(). XMLParser can be used not only for
+building a tree structure. This is an example of counting the maximum depth
+of an XML file:
+A pull parser suitable for non-blocking applications.  Its input-side API is
+similar to that of XMLParser, but instead of pushing calls to a
+callback target, XMLPullParser collects an internal list of parsing
+events and lets the user read from it. events is a sequence of events to
+report back.  The supported events are the strings "start", "end",
+"comment", "pi", "start-ns" and "end-ns" (the "ns" events
+are used to get detailed namespace information).  If events is omitted,
+only "end" events are reported.
+Feed the given bytes data to the parser.
+Signal the parser that the data stream is terminated. Unlike
+XMLParser.close(), this method always returns None.
+Any events not yet retrieved when the parser is closed can still be
+read with read_events().
+Return an iterator over the events which have been encountered in the
+data fed to the
+parser.  The iterator yields (event, elem) pairs, where event is a
+string representing the type of event (e.g. "end") and elem is the
+encountered Element object, or other context value as follows.
+start, end: the current Element.
+comment, pi: the current comment / processing instruction
+start-ns: a tuple (prefix, uri) naming the declared namespace
+mapping.
+end-ns: None (this may change in a future version)
+Events provided in a previous call to read_events() will not be
+yielded again.  Events are consumed from the internal queue only when
+they are retrieved from the iterator, so multiple readers iterating in
+parallel over iterators obtained from read_events() will have
+unpredictable results.
+注解
+XMLPullParser only guarantees that it has seen the "&gt;"
+character of a starting tag when it emits a "start" event, so the
+attributes are defined, but the contents of the text and tail attributes
+are undefined at that point.  The same applies to the element children;
+they may or may not be present.
+If you need a fully populated element, look for "end" events instead.
+3.4 新版功能.
+在 3.8 版更改: The comment and pi events were added.
+XML parse error, raised by the various parsing methods in this module when
+parsing fails.  The string representation of an instance of this exception
+will contain a user-friendly error message.  In addition, it will have
+the following attributes available:
+A numeric error code from the expat parser. See the documentation of
+xml.parsers.expat for the list of error codes and their meanings.
+A tuple of line, column numbers, specifying where the error occurred.
+备注
+The encoding string included in XML output should conform to the
+appropriate standards.  For example, "UTF-8" is valid, but "UTF8" is
+not.  See https://www.w3.org/TR/2006/REC-xml11-20060816/#NT-EncodingDecl
+and https://www.iana.org/assignments/character-sets/character-sets.xhtml.
+XML处理模块
+xml.dom --- The Document Object Model API
+</body></doc>

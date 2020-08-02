@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='utf-8'?>
+<doc><id>115</id><url>https://docs.python.org/zh-cn/3/library/concurrent.html</url><title> 包</title><body>目前，此包中只有一个模块：
+concurrent.futures —— 启动并行任务
+multiprocessing.shared_memory --- 可从进程直接访问的共享内存
+concurrent.futures --- 启动并行任务
+</body></doc>

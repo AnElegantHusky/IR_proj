@@ -1,0 +1,884 @@
+<?xml version='1.0' encoding='utf-8'?>
+<doc><id>287</id><url>https://docs.python.org/zh-cn/3/library/ctypes.html</url><title> --- Python 的外部函数库</title><body>ctypes 是 Python 的外部函数库。它提供了与 C 兼容的数据类型，并允许调用 DLL 或共享库中的函数。可使用该模块以纯 Python 形式对这些库进行封装。
+注意：在本教程中的示例代码使用 doctest 进行过测试，保证其正确运行。由于有些代码在Linux，Windows或Mac OS X下的表现不同，这些代码会在 doctest 中包含相关的指令注解。
+注意：部分示例代码引用了 ctypes c_int 类型。在 sizeof(long) == sizeof(int) 的平台上此类型是 c_long 的一个别名。所以，在程序输出 c_long 而不是你期望的 c_int 时不必感到迷惑 --- 它们实际上是同一种类型。
+ctypes 导出了 cdll 对象，在 Windows 系统中还导出了 windll 和 oledll 对象用于载入动态连接库。
+通过操作这些对象的属性，你可以载入外部的动态链接库。cdll 载入按标准的 cdecl 调用协议导出的函数，而 windll 导入的库按 stdcall 调用协议调用其中的函数。 oledll 也按 stdcall 调用协议调用其中的函数，并假定该函数返回的是 Windows HRESULT 错误代码，并当函数调用失败时，自动根据该代码甩出一个 OSError 异常。
+在 3.3 版更改: 原来在 Windows 下甩出的异常类型 WindowsError 现在是 OSError 的一个别名。
+这是一些 Windows 下的例子。注意：msvcrt 是微软 C 标准库，包含了大部分 C 标准函数，这些函数都是以 cdecl 调用协议进行调用的。
+Windows会自动添加通常的 .dll 文件扩展名。
+注解
+通过 cdll.msvcrt 调用的标准 C 函数，可能会导致调用一个过时的，与当前 Python 所不兼容的函数。因此，请尽量使用标准的 Python 函数，而不要使用 msvcrt 模块。
+在 Linux 下，必须使用 包含 文件扩展名的文件名来导入共享库。因此不能简单使用对象属性的方式来导入库。因此，你可以使用方法 LoadLibrary()，或构造 CDLL 对象来导入库。
+通过操作dll对象的属性来操作这些函数。
+注意：Win32系统的动态库，比如 kernel32 和 user32，通常会同时导出同一个函数的 ANSI 版本和 UNICODE 版本。UNICODE 版本通常会在名字最后以 W 结尾，而 ANSI 版本的则以 A 结尾。 win32的 GetModuleHandle 函数会根据一个模块名返回一个 模块句柄，该函数暨同时包含这样的两个版本的原型函数，并通过宏 UNICODE 是否定义，来决定宏 GetModuleHandle 导出的是哪个具体函数。
+windll 不会通过这样的魔法手段来帮你决定选择哪一种函数，你必须显式的调用 GetModuleHandleA 或 GetModuleHandleW，并分别使用字节对象或字符串对象作参数。
+有时候，dlls的导出的函数名不符合 Python 的标识符规范，比如 "??2@YAPAXI@Z"。此时，你必须使用 getattr() 方法来获得该函数。
+Windows 下，有些 dll 导出的函数没有函数名，而是通过其顺序号调用。对此类函数，你也可以通过 dll 对象的数值索引来操作这些函数。
+你可以貌似是调用其它 Python 函数那样直接调用这些函数。在这个例子中，我们调用了 time() 函数，该函数返回一个系统时间戳（从 Unix 时间起点到现在的秒数），而``GetModuleHandleA()`` 函数返回一个 win32 模块句柄。
+此函数中调用的两个函数都使用了空指针（用 None 作为空指针）:
+如果你用 cdecl 调用方式调用 stdcall 约定的函数，则会甩出一个异常 ValueError。反之亦然。
+你必须阅读这些库的头文件或说明文档来确定它们的正确的调用协议。
+在Windows中，ctypes 使用 win32 结构化异常处理来防止由于在调用函数时使用非法参数导致的程序崩溃。
+然而，总有许多办法，通过调用 ctypes 使得 Python 程序崩溃。因此，你必须小心使用。 faulthandler 模块可以用于帮助诊断程序崩溃的原因。（比如由于错误的C库函数调用导致的段错误）。
+None，整型，字节对象和（UNICODE）字符串是仅有的可以直接作为函数参数使用的四种Python本地数据类型。None` 作为C的空指针 (NULL)，字节和字符串类型作为一个指向其保存数据的内存块指针 （char * 或 wchar_t *)。Python 的整型则作为平台默认的C的 int 类型，他们的数值被截断以适应C类型的整型长度。
+在我们开始调用函数前，我们必须先了解作为函数参数的 ctypes 数据类型。
+ctypes 定义了一些和C兼容的基本数据类型：
+ctypes 类型
+C 类型
+Python 类型
+c_bool
+_Bool
+bool (1)
+c_char
+char
+单字符字节对象
+c_wchar
+wchar_t
+单字符字符串
+c_byte
+char
+int
+c_ubyte
+unsigned char
+int
+c_short
+short
+int
+c_ushort
+unsigned short
+int
+c_int
+int
+int
+c_uint
+unsigned int
+int
+c_long
+long
+int
+c_ulong
+unsigned long
+int
+c_longlong
+__int64 或 long long
+int
+c_ulonglong
+unsigned __int64 或 unsigned long long
+int
+c_size_t
+size_t
+int
+c_ssize_t
+ssize_t 或 Py_ssize_t
+int
+c_float
+float
+float
+c_double
+double
+float
+c_longdouble
+long double
+float
+c_char_p
+char * (以 NUL 结尾)
+字节串对象或 None
+c_wchar_p
+wchar_t * (以 NUL 结尾)
+字符串或 None
+c_void_p
+void *
+int 或 None
+构造函数接受任何具有真值的对象。
+所有这些类型都可以通过使用正确类型和值的可选初始值调用它们来创建:
+由于这些类型是可变的，它们的值也可以在以后更改:
+当给指针类型的对象 c_char_p, c_wchar_p 和 c_void_p 等赋值时，将改变它们所指向的 内存地址，而 不是 它们所指向的内存区域的 内容 (这是理所当然的，因为 Python 的 bytes 对象是不可变的):
+但你要注意不能将它们传递给会改变指针所指内存的函数。如果你需要可改变的内存块，ctypes 提供了 create_string_buffer() 函数，它提供多种方式创建这种内存块。当前的内存块内容可以通过 raw 属性存取，如果你希望将它作为NUL结束的字符串，请使用 value 属性:
+create_string_buffer() 函数替代以前的ctypes版本中的 c_buffer() 函数 (仍然可当作别名使用)和 c_string() 函数。create_unicode_buffer() 函数创建包含 unicode 字符的可变内存块，与之对应的C语言类型是 wchar_t。
+注意 printf 将打印到真正标准输出设备，而*不是* sys.stdout，因此这些实例只能在控制台提示符下工作，而不能在 IDLE 或 PythonWin 中运行。
+正如前面所提到过的，除了整数、字符串以及字节串之外，所有的 Python 类型都必须使用它们对应的 ctypes 类型包装，才能够被正确地转换为所需的C语言类型。
+你也可以通过自定义  ctypes 参数转换方式来允许自定义类型作为参数。 ctypes 会寻找 _as_parameter_ 属性并使用它作为函数参数。当然，它必须是数字、字符串或者二进制字符串:
+如果你不想把实例的数据存储到 _as_parameter_ 属性。可以通过定义 property 函数计算出这个属性。
+可以通过设置 argtypes 属性的方法指定从 DLL 中导出函数的必选参数类型。
+argtypes 必须是一个 C 数据类型的序列 (这里的 printf 可能不是个好例子，因为它是变长参数，而且每个参数的类型依赖于格式化字符串，不过尝试这个功能也很方便):
+指定数据类型可以防止不合理的参数传递(就像C函数的函数签名)，并且会自动尝试将参数转换为需要的类型:
+如果你想通过自定义类型传递参数给函数，必须实现 from_param() 类方法，才能够将此自定义类型用于 argtypes 序列。from_param() 类方法接受一个 Python 对象作为函数输入，它应该进行类型检查或者其他必要的操作以保证接收到的对象是合法的，然后返回这个对象，或者它的 _as_parameter_ 属性，或者其他你想要传递给 C 函数的参数。这里也一样，返回的结果必须是整型、字符串、二进制字符串、 ctypes 类型，或者一个具有 _as_parameter_ 属性的对象。
+默认情况下都会假定函数返回C int 类型。其他返回类型可以通过设置函数对象的 restype 属性来指定。
+这是个更高级的例子，它调用了 strchr 函数，这个函数接收一个字符串指针以及一个字符作为参数，返回另一个字符串指针。
+如果希望避免上述的 ord("x") 调用，可以设置  argtypes  属性，第二个参数就会将单字符的 Python 二进制字符对象转换为 C 字符:
+如果外部函数返回了一个整数，你也可以使用要给可调用的 Python 对象（比如函数或者类）作为 restype 属性的值。将会以 C 函数返回的 整数 对象作为参数调用这个可调用对象，执行后的结果作为最终函数返回值。这在错误返回值校验和自动抛出异常等方面比较有用。
+WinError 函数可以调用 Windows 的  FormatMessage() API 获取错误码的字符串说明，然后 返回 一个异常。 WinError 接收一个可选的错误码作为参数，如果没有的话，它将调用  GetLastError() 获取错误码。
+请注意，使用 errcheck  属性可以实现更强大的错误检查手段；详情请见参考手册。
+有时候 C 函数接口可能由于要往某个地址写入值，或者数据太大不适合作为值传递，从而希望接收一个 指针 作为数据参数类型。这和 传递参数引用 类似。
+ctypes 暴露了 byref() 函数用于通过引用传递参数，使用 pointer() 函数也能达到同样的效果，只不过 pointer() 需要更多步骤，因为它要先构造一个真实指针对象。所以在 Python 代码本身不需要使用这个指针对象的情况下，使用 byref() 效率更高。
+结构体和联合必须继承自 ctypes 模块中的 Structure 和 Union 。子类必须定义 _fields_ 属性。 _fields_ 是一个二元组列表，二元组中包含 field name 和 field type 。
+type 字段必须是一个 ctypes 类型，比如  c_int，或者其他 ctypes 类型: 结构体、联合、数组、指针。
+这是一个简单的 POINT 结构体，它包含名称为 x 和 y 的两个变量，还展示了如何通过构造函数初始化结构体。
+当然，你可以构造更复杂的结构体。一个结构体可以通过设置 type 字段包含其他结构体或者自身。
+这是以一个 RECT 结构体，他包含了两个 POINT ，分别叫 upperleft 和 lowerright:
+嵌套结构体可以通过几种方式构造初始化:
+可以通过 类 获取字段 descriptor ，它能提供很多有用的调试信息。
+警告
+ctypes 不支持带位域的结构体、联合以值的方式传给函数。这可能在 32 位 x86 平台上可以正常工作，但是对于一般情况，这种行为是未定义的。带位域的结构体、联合应该总是通过指针传递给函数。
+默认情况下，结构体和联合的字段与C的字节对齐是一样的。也可以在定义子类的时候指定类的 _pack_ 属性来覆盖这种行为。它必须设置为一个正整数，表示字段的最大对齐字节。这和 MSVC 中的 #pragma pack(n) 功能一样。
+ctypes 中的结构体和联合使用的是本地字节序。要使用非本地字节序，可以使用 BigEndianStructure, LittleEndianStructure, BigEndianUnion, and LittleEndianUnion 作为基类。这些类不能包含指针字段。
+结构体和联合中是可以包含位域字段的。位域只能用于整型字段，位长度通过 _fields_ 中的第三个参数指定:
+数组是一个序列，包含指定个数元素，且必须类型相同。
+创建数组类型的推荐方式是使用一个类型乘以一个正数:
+下面是一个构造的数据案例，结构体中包含了4个 POINT 和一些其他东西。
+和平常一样，通过调用它创建实例:
+以上代码会打印几行 0 0 ，因为数组内容被初始化为 0.
+也能通过指定正确类型的数据来初始化:
+指针可以通过 ctypes 中的 pointer() 函数进行创建:
+Pointer instances have a contents attribute which
+returns the object to which the pointer points, the i object above:
+Note that ctypes does not have OOR (original object return), it constructs a
+new, equivalent object each time you retrieve an attribute:
+Assigning another c_int instance to the pointer's contents attribute
+would cause the pointer to point to the memory location where this is stored:
+Pointer instances can also be indexed with integers:
+Assigning to an integer index changes the pointed to value:
+It is also possible to use indexes different from 0, but you must know what
+you're doing, just as in C: You can access or change arbitrary memory locations.
+Generally you only use this feature if you receive a pointer from a C function,
+and you know that the pointer actually points to an array instead of a single
+item.
+Behind the scenes, the pointer() function does more than simply create
+pointer instances, it has to create pointer types first. This is done with the
+POINTER() function, which accepts any ctypes type, and returns a
+new type:
+Calling the pointer type without an argument creates a NULL pointer.
+NULL pointers have a False boolean value:
+ctypes checks for NULL when dereferencing pointers (but dereferencing
+invalid non-NULL pointers would crash Python):
+Usually, ctypes does strict type checking.  This means, if you have
+POINTER(c_int) in the argtypes list of a function or as the type of
+a member field in a structure definition, only instances of exactly the same
+type are accepted.  There are some exceptions to this rule, where ctypes accepts
+other objects.  For example, you can pass compatible array instances instead of
+pointer types.  So, for POINTER(c_int), ctypes accepts an array of c_int:
+In addition, if a function argument is explicitly declared to be a pointer type
+(such as POINTER(c_int)) in argtypes, an object of the pointed
+type (c_int in this case) can be passed to the function.  ctypes will apply
+the required byref() conversion in this case automatically.
+To set a POINTER type field to NULL, you can assign None:
+Sometimes you have instances of incompatible types.  In C, you can cast one type
+into another type.  ctypes provides a cast() function which can be
+used in the same way.  The Bar structure defined above accepts
+POINTER(c_int) pointers or c_int arrays for its values field,
+but not instances of other types:
+For these cases, the cast() function is handy.
+The cast() function can be used to cast a ctypes instance into a pointer
+to a different ctypes data type.  cast() takes two parameters, a ctypes
+object that is or can be converted to a pointer of some kind, and a ctypes
+pointer type.  It returns an instance of the second argument, which references
+the same memory block as the first argument:
+So, cast() can be used to assign to the values field of Bar the
+structure:
+Incomplete Types are structures, unions or arrays whose members are not yet
+specified. In C, they are specified by forward declarations, which are defined
+later:
+The straightforward translation into ctypes code would be this, but it does not
+work:
+because the new class cell is not available in the class statement itself.
+In ctypes, we can define the cell class and set the _fields_
+attribute later, after the class statement:
+Let's try it. We create two instances of cell, and let them point to each
+other, and finally follow the pointer chain a few times:
+ctypes allows creating C callable function pointers from Python callables.
+These are sometimes called callback functions.
+First, you must create a class for the callback function. The class knows the
+calling convention, the return type, and the number and types of arguments this
+function will receive.
+The CFUNCTYPE() factory function creates types for callback functions
+using the cdecl calling convention. On Windows, the WINFUNCTYPE()
+factory function creates types for callback functions using the stdcall
+calling convention.
+Both of these factory functions are called with the result type as first
+argument, and the callback functions expected argument types as the remaining
+arguments.
+I will present an example here which uses the standard C library's
+qsort() function, that is used to sort items with the help of a callback
+function.  qsort() will be used to sort an array of integers:
+qsort() must be called with a pointer to the data to sort, the number of
+items in the data array, the size of one item, and a pointer to the comparison
+function, the callback. The callback will then be called with two pointers to
+items, and it must return a negative integer if the first item is smaller than
+the second, a zero if they are equal, and a positive integer otherwise.
+So our callback function receives pointers to integers, and must return an
+integer. First we create the type for the callback function:
+To get started, here is a simple callback that shows the values it gets
+passed:
+The result:
+Now we can actually compare the two items and return a useful result:
+As we can easily check, our array is sorted now:
+The function factories can be used as decorator factories, so we may as well
+write:
+注解
+Make sure you keep references to CFUNCTYPE() objects as long as they
+are used from C code. ctypes doesn't, and if you don't, they may be
+garbage collected, crashing your program when a callback is made.
+Also, note that if the callback function is called in a thread created
+outside of Python's control (e.g. by the foreign code that calls the
+callback), ctypes creates a new dummy Python thread on every invocation. This
+behavior is correct for most purposes, but it means that values stored with
+threading.local will not survive across different callbacks, even when
+those calls are made from the same C thread.
+Some shared libraries not only export functions, they also export variables. An
+example in the Python library itself is the Py_OptimizeFlag, an integer
+set to 0, 1, or 2, depending on the -O or -OO flag given on
+startup.
+ctypes can access values like this with the in_dll() class methods of
+the type.  pythonapi is a predefined symbol giving access to the Python C
+api:
+If the interpreter would have been started with -O, the sample would
+have printed c_long(1), or c_long(2) if -OO would have been
+specified.
+An extended example which also demonstrates the use of pointers accesses the
+PyImport_FrozenModules pointer exported by Python.
+Quoting the docs for that value:
+This pointer is initialized to point to an array of struct _frozen
+records, terminated by one whose members are all NULL or zero.  When a frozen
+module is imported, it is searched in this table.  Third-party code could play
+tricks with this to provide a dynamically created collection of frozen modules.
+So manipulating this pointer could even prove useful. To restrict the example
+size, we show only how this table can be read with ctypes:
+We have defined the struct _frozen data type, so we can get the pointer
+to the table:
+Since table is a pointer to the array of struct_frozen records, we
+can iterate over it, but we just have to make sure that our loop terminates,
+because pointers have no size. Sooner or later it would probably crash with an
+access violation or whatever, so it's better to break out of the loop when we
+hit the NULL entry:
+The fact that standard Python has a frozen module and a frozen package
+(indicated by the negative size member) is not well known, it is only used
+for testing. Try it out with import __hello__ for example.
+There are some edges in ctypes where you might expect something other
+than what actually happens.
+Consider the following example:
+Hm. We certainly expected the last statement to print 3 4 1 2. What
+happened? Here are the steps of the rc.a, rc.b = rc.b, rc.a line above:
+Note that temp0 and temp1 are objects still using the internal buffer of
+the rc object above. So executing rc.a = temp0 copies the buffer
+contents of temp0 into rc 's buffer.  This, in turn, changes the
+contents of temp1. So, the last assignment rc.b = temp1, doesn't have
+the expected effect.
+Keep in mind that retrieving sub-objects from Structure, Unions, and Arrays
+doesn't copy the sub-object, instead it retrieves a wrapper object accessing
+the root-object's underlying buffer.
+Another example that may behave differently from what one would expect is this:
+注解
+Objects instantiated from c_char_p can only have their value set to bytes
+or integers.
+Why is it printing False?  ctypes instances are objects containing a memory
+block plus some descriptors accessing the contents of the memory.
+Storing a Python object in the memory block does not store the object itself,
+instead the contents of the object is stored.  Accessing the contents again
+constructs a new Python object each time!
+ctypes provides some support for variable-sized arrays and structures.
+The resize() function can be used to resize the memory buffer of an
+existing ctypes object.  The function takes the object as first argument, and
+the requested size in bytes as the second argument.  The memory block cannot be
+made smaller than the natural memory block specified by the objects type, a
+ValueError is raised if this is tried:
+This is nice and fine, but how would one access the additional elements
+contained in this array?  Since the type still only knows about 4 elements, we
+get errors accessing other elements:
+Another way to use variable-sized data types with ctypes is to use the
+dynamic nature of Python, and (re-)define the data type after the required size
+is already known, on a case by case basis.
+When programming in a compiled language, shared libraries are accessed when
+compiling/linking a program, and when the program is run.
+The purpose of the find_library() function is to locate a library in a way
+similar to what the compiler or runtime loader does (on platforms with several
+versions of a shared library the most recent should be loaded), while the ctypes
+library loaders act like when a program is run, and call the runtime loader
+directly.
+The ctypes.util module provides a function which can help to determine
+the library to load.
+Try to find a library and return a pathname.  name is the library name without
+any prefix like lib, suffix like .so, .dylib or version number (this
+is the form used for the posix linker option -l).  If no library can
+be found, returns None.
+The exact functionality is system dependent.
+On Linux, find_library() tries to run external programs
+(/sbin/ldconfig, gcc, objdump and ld) to find the library file.
+It returns the filename of the library file.
+在 3.6 版更改: On Linux, the value of the environment variable LD_LIBRARY_PATH is used
+when searching for libraries, if a library cannot be found by any other means.
+Here are some examples:
+On OS X, find_library() tries several predefined naming schemes and paths
+to locate the library, and returns a full pathname if successful:
+On Windows, find_library() searches along the system search path, and
+returns the full pathname, but since there is no predefined naming scheme a call
+like find_library("c") will fail and return None.
+If wrapping a shared library with ctypes, it may be better to determine
+the shared library name at development time, and hardcode that into the wrapper
+module instead of using find_library() to locate the library at runtime.
+There are several ways to load shared libraries into the Python process.  One
+way is to instantiate one of the following classes:
+Instances of this class represent loaded shared libraries. Functions in these
+libraries use the standard C calling convention, and are assumed to return
+int.
+Windows only: Instances of this class represent loaded shared libraries,
+functions in these libraries use the stdcall calling convention, and are
+assumed to return the windows specific HRESULT code.  HRESULT
+values contain information specifying whether the function call failed or
+succeeded, together with additional error code.  If the return value signals a
+failure, an OSError is automatically raised.
+在 3.3 版更改: WindowsError used to be raised.
+Windows only: Instances of this class represent loaded shared libraries,
+functions in these libraries use the stdcall calling convention, and are
+assumed to return int by default.
+On Windows CE only the standard calling convention is used, for convenience the
+WinDLL and OleDLL use the standard calling convention on this
+platform.
+The Python global interpreter lock is released before calling any
+function exported by these libraries, and reacquired afterwards.
+Instances of this class behave like CDLL instances, except that the
+Python GIL is not released during the function call, and after the function
+execution the Python error flag is checked. If the error flag is set, a Python
+exception is raised.
+Thus, this is only useful to call Python C api functions directly.
+All these classes can be instantiated by calling them with at least one
+argument, the pathname of the shared library.  If you have an existing handle to
+an already loaded shared library, it can be passed as the handle named
+parameter, otherwise the underlying platforms dlopen or LoadLibrary
+function is used to load the library into the process, and to get a handle to
+it.
+The mode parameter can be used to specify how the library is loaded.  For
+details, consult the dlopen(3) manpage.  On Windows, mode is
+ignored.  On posix systems, RTLD_NOW is always added, and is not
+configurable.
+The use_errno parameter, when set to true, enables a ctypes mechanism that
+allows accessing the system errno error number in a safe way.
+ctypes maintains a thread-local copy of the systems errno
+variable; if you call foreign functions created with use_errno=True then the
+errno value before the function call is swapped with the ctypes private
+copy, the same happens immediately after the function call.
+The function ctypes.get_errno() returns the value of the ctypes private
+copy, and the function ctypes.set_errno() changes the ctypes private copy
+to a new value and returns the former value.
+The use_last_error parameter, when set to true, enables the same mechanism for
+the Windows error code which is managed by the GetLastError() and
+SetLastError() Windows API functions; ctypes.get_last_error() and
+ctypes.set_last_error() are used to request and change the ctypes private
+copy of the windows error code.
+The winmode parameter is used on Windows to specify how the library is loaded
+(since mode is ignored). It takes any value that is valid for the Win32 API
+LoadLibraryEx flags parameter. When omitted, the default is to use the flags
+that result in the most secure DLL load to avoiding issues such as DLL
+hijacking. Passing the full path to the DLL is the safest way to ensure the
+correct library and dependencies are loaded.
+在 3.8 版更改: Added winmode parameter.
+Flag to use as mode parameter.  On platforms where this flag is not available,
+it is defined as the integer zero.
+Flag to use as mode parameter.  On platforms where this is not available, it
+is the same as RTLD_GLOBAL.
+The default mode which is used to load shared libraries.  On OSX 10.3, this is
+RTLD_GLOBAL, otherwise it is the same as RTLD_LOCAL.
+Instances of these classes have no public methods.  Functions exported by the
+shared library can be accessed as attributes or by index.  Please note that
+accessing the function through an attribute caches the result and therefore
+accessing it repeatedly returns the same object each time.  On the other hand,
+accessing it through an index returns a new object each time:
+The following public attributes are available, their name starts with an
+underscore to not clash with exported function names:
+The system handle used to access the library.
+The name of the library passed in the constructor.
+Shared libraries can also be loaded by using one of the prefabricated objects,
+which are instances of the LibraryLoader class, either by calling the
+LoadLibrary() method, or by retrieving the library as attribute of the
+loader instance.
+Class which loads shared libraries.  dlltype should be one of the
+CDLL, PyDLL, WinDLL, or OleDLL types.
+__getattr__() has special behavior: It allows loading a shared library by
+accessing it as attribute of a library loader instance.  The result is cached,
+so repeated attribute accesses return the same library each time.
+Load a shared library into the process and return it.  This method always
+returns a new instance of the library.
+These prefabricated library loaders are available:
+Creates CDLL instances.
+仅Windows中: 创建 WinDLL 实例.
+仅Windows中: 创建 OleDLL 实例。
+创建 PyDLL 实例。
+For accessing the C Python api directly, a ready-to-use Python shared library
+object is available:
+An instance of PyDLL that exposes Python C API functions as
+attributes.  Note that all these functions are assumed to return C
+int, which is of course not always the truth, so you have to assign
+the correct restype attribute to use these functions.
+
+Loading a library through any of these objects raises an
+auditing event ctypes.dlopen with string argument
+name, the name used to load the library.
+
+Accessing a function on a loaded library raises an auditing event
+ctypes.dlsym with arguments library (the library object) and name
+(the symbol's name as a string or integer).
+
+In cases when only the library handle is available rather than the object,
+accessing a function raises an auditing event ctypes.dlsym/handle with
+arguments handle (the raw library handle) and name.
+As explained in the previous section, foreign functions can be accessed as
+attributes of loaded shared libraries.  The function objects created in this way
+by default accept any number of arguments, accept any ctypes data instances as
+arguments, and return the default result type specified by the library loader.
+They are instances of a private class:
+Base class for C callable foreign functions.
+Instances of foreign functions are also C compatible data types; they
+represent C function pointers.
+This behavior can be customized by assigning to special attributes of the
+foreign function object.
+Assign a ctypes type to specify the result type of the foreign function.
+Use None for void, a function not returning anything.
+It is possible to assign a callable Python object that is not a ctypes
+type, in this case the function is assumed to return a C int, and
+the callable will be called with this integer, allowing further
+processing or error checking.  Using this is deprecated, for more flexible
+post processing or error checking use a ctypes data type as
+restype and assign a callable to the errcheck attribute.
+Assign a tuple of ctypes types to specify the argument types that the
+function accepts.  Functions using the stdcall calling convention can
+only be called with the same number of arguments as the length of this
+tuple; functions using the C calling convention accept additional,
+unspecified arguments as well.
+When a foreign function is called, each actual argument is passed to the
+from_param() class method of the items in the argtypes
+tuple, this method allows adapting the actual argument to an object that
+the foreign function accepts.  For example, a c_char_p item in
+the argtypes tuple will convert a string passed as argument into
+a bytes object using ctypes conversion rules.
+New: It is now possible to put items in argtypes which are not ctypes
+types, but each item must have a from_param() method which returns a
+value usable as argument (integer, string, ctypes instance).  This allows
+defining adapters that can adapt custom objects as function parameters.
+Assign a Python function or another callable to this attribute. The
+callable will be called with three or more arguments:
+result is what the foreign function returns, as specified by the
+restype attribute.
+func is the foreign function object itself, this allows reusing the
+same callable object to check or post process the results of several
+functions.
+arguments is a tuple containing the parameters originally passed to
+the function call, this allows specializing the behavior on the
+arguments used.
+The object that this function returns will be returned from the
+foreign function call, but it can also check the result value
+and raise an exception if the foreign function call failed.
+This exception is raised when a foreign function call cannot convert one of the
+passed arguments.
+
+On Windows, when a foreign function call raises a system exception (for
+example, due to an access violation), it will be captured and replaced with
+a suitable Python exception. Further, an auditing event
+ctypes.seh_exception with argument code will be raised, allowing an
+audit hook to replace the exception with its own.
+
+Some ways to invoke foreign function calls may raise an auditing event
+ctypes.call_function with arguments function pointer and arguments.
+Foreign functions can also be created by instantiating function prototypes.
+Function prototypes are similar to function prototypes in C; they describe a
+function (return type, argument types, calling convention) without defining an
+implementation.  The factory functions must be called with the desired result
+type and the argument types of the function, and can be used as decorator
+factories, and as such, be applied to functions through the @wrapper syntax.
+See Callback functions for examples.
+The returned function prototype creates functions that use the standard C
+calling convention.  The function will release the GIL during the call.  If
+use_errno is set to true, the ctypes private copy of the system
+errno variable is exchanged with the real errno value before
+and after the call; use_last_error does the same for the Windows error
+code.
+Windows only: The returned function prototype creates functions that use the
+stdcall calling convention, except on Windows CE where
+WINFUNCTYPE() is the same as CFUNCTYPE().  The function will
+release the GIL during the call.  use_errno and use_last_error have the
+same meaning as above.
+The returned function prototype creates functions that use the Python calling
+convention.  The function will not release the GIL during the call.
+Function prototypes created by these factory functions can be instantiated in
+different ways, depending on the type and number of the parameters in the call:
+Returns a foreign function at the specified address which must be an integer.
+Create a C callable function (a callback function) from a Python callable.
+Returns a foreign function exported by a shared library. func_spec must
+be a 2-tuple (name_or_ordinal, library). The first item is the name of
+the exported function as string, or the ordinal of the exported function
+as small integer.  The second item is the shared library instance.
+Returns a foreign function that will call a COM method. vtbl_index is
+the index into the virtual function table, a small non-negative
+integer. name is name of the COM method. iid is an optional pointer to
+the interface identifier which is used in extended error reporting.
+COM methods use a special calling convention: They require a pointer to
+the COM interface as first argument, in addition to those parameters that
+are specified in the argtypes tuple.
+The optional paramflags parameter creates foreign function wrappers with much
+more functionality than the features described above.
+paramflags must be a tuple of the same length as argtypes.
+Each item in this tuple contains further information about a parameter, it must
+be a tuple containing one, two, or three items.
+The first item is an integer containing a combination of direction
+flags for the parameter:
+Specifies an input parameter to the function.
+Output parameter.  The foreign function fills in a value.
+Input parameter which defaults to the integer zero.
+The optional second item is the parameter name as string.  If this is specified,
+the foreign function can be called with named parameters.
+The optional third item is the default value for this parameter.
+This example demonstrates how to wrap the Windows MessageBoxW function so
+that it supports default parameters and named arguments. The C declaration from
+the windows header file is this:
+Here is the wrapping with ctypes:
+The MessageBox foreign function can now be called in these ways:
+A second example demonstrates output parameters.  The win32 GetWindowRect
+function retrieves the dimensions of a specified window by copying them into
+RECT structure that the caller has to supply.  Here is the C declaration:
+Here is the wrapping with ctypes:
+Functions with output parameters will automatically return the output parameter
+value if there is a single one, or a tuple containing the output parameter
+values when there are more than one, so the GetWindowRect function now returns a
+RECT instance, when called.
+Output parameters can be combined with the errcheck protocol to do
+further output processing and error checking.  The win32 GetWindowRect api
+function returns a BOOL to signal success or failure, so this function could
+do the error checking, and raises an exception when the api call failed:
+If the errcheck function returns the argument tuple it receives
+unchanged, ctypes continues the normal processing it does on the output
+parameters.  If you want to return a tuple of window coordinates instead of a
+RECT instance, you can retrieve the fields in the function and return them
+instead, the normal processing will no longer take place:
+Returns the address of the memory buffer as integer.  obj must be an
+instance of a ctypes type.
+Raises an auditing event ctypes.addressof with argument obj.
+Returns the alignment requirements of a ctypes type. obj_or_type must be a
+ctypes type or instance.
+Returns a light-weight pointer to obj, which must be an instance of a
+ctypes type.  offset defaults to zero, and must be an integer that will be
+added to the internal pointer value.
+byref(obj, offset) corresponds to this C code:
+The returned object can only be used as a foreign function call parameter.
+It behaves similar to pointer(obj), but the construction is a lot faster.
+This function is similar to the cast operator in C. It returns a new instance
+of type which points to the same memory block as obj.  type must be a
+pointer type, and obj must be an object that can be interpreted as a
+pointer.
+This function creates a mutable character buffer. The returned object is a
+ctypes array of c_char.
+init_or_size must be an integer which specifies the size of the array, or a
+bytes object which will be used to initialize the array items.
+If a bytes object is specified as first argument, the buffer is made one item
+larger than its length so that the last element in the array is a NUL
+termination character. An integer can be passed as second argument which allows
+specifying the size of the array if the length of the bytes should not be used.
+Raises an auditing event ctypes.create_string_buffer with arguments init, size.
+This function creates a mutable unicode character buffer. The returned object is
+a ctypes array of c_wchar.
+init_or_size must be an integer which specifies the size of the array, or a
+string which will be used to initialize the array items.
+If a string is specified as first argument, the buffer is made one item
+larger than the length of the string so that the last element in the array is a
+NUL termination character. An integer can be passed as second argument which
+allows specifying the size of the array if the length of the string should not
+be used.
+Raises an auditing event ctypes.create_unicode_buffer with arguments init, size.
+Windows only: This function is a hook which allows implementing in-process
+COM servers with ctypes.  It is called from the DllCanUnloadNow function that
+the _ctypes extension dll exports.
+Windows only: This function is a hook which allows implementing in-process
+COM servers with ctypes.  It is called from the DllGetClassObject function
+that the _ctypes extension dll exports.
+Try to find a library and return a pathname.  name is the library name
+without any prefix like lib, suffix like .so, .dylib or version
+number (this is the form used for the posix linker option -l).  If
+no library can be found, returns None.
+The exact functionality is system dependent.
+Windows only: return the filename of the VC runtime library used by Python,
+and by the extension modules.  If the name of the library cannot be
+determined, None is returned.
+If you need to free memory, for example, allocated by an extension module
+with a call to the free(void *), it is important that you use the
+function in the same library that allocated the memory.
+Windows only: Returns a textual description of the error code code.  If no
+error code is specified, the last error code is used by calling the Windows
+api function GetLastError.
+Windows only: Returns the last error code set by Windows in the calling thread.
+This function calls the Windows GetLastError() function directly,
+it does not return the ctypes-private copy of the error code.
+Returns the current value of the ctypes-private copy of the system
+errno variable in the calling thread.
+Raises an auditing event ctypes.get_errno with no arguments.
+Windows only: returns the current value of the ctypes-private copy of the system
+LastError variable in the calling thread.
+Raises an auditing event ctypes.get_last_error with no arguments.
+Same as the standard C memmove library function: copies count bytes from
+src to dst. dst and src must be integers or ctypes instances that can
+be converted to pointers.
+Same as the standard C memset library function: fills the memory block at
+address dst with count bytes of value c. dst must be an integer
+specifying an address, or a ctypes instance.
+This factory function creates and returns a new ctypes pointer type. Pointer
+types are cached and reused internally, so calling this function repeatedly is
+cheap. type must be a ctypes type.
+This function creates a new pointer instance, pointing to obj. The returned
+object is of the type POINTER(type(obj)).
+Note: If you just want to pass a pointer to an object to a foreign function
+call, you should use byref(obj) which is much faster.
+This function resizes the internal memory buffer of obj, which must be an
+instance of a ctypes type.  It is not possible to make the buffer smaller
+than the native size of the objects type, as given by sizeof(type(obj)),
+but it is possible to enlarge the buffer.
+Set the current value of the ctypes-private copy of the system errno
+variable in the calling thread to value and return the previous value.
+Raises an auditing event ctypes.set_errno with argument errno.
+Windows only: set the current value of the ctypes-private copy of the system
+LastError variable in the calling thread to value and return the
+previous value.
+Raises an auditing event ctypes.set_last_error with argument error.
+Returns the size in bytes of a ctypes type or instance memory buffer.
+Does the same as the C sizeof operator.
+This function returns the C string starting at memory address address as a bytes
+object. If size is specified, it is used as size, otherwise the string is assumed
+to be zero-terminated.
+Raises an auditing event ctypes.string_at with arguments address, size.
+Windows only: this function is probably the worst-named thing in ctypes. It
+creates an instance of OSError.  If code is not specified,
+GetLastError is called to determine the error code. If descr is not
+specified, FormatError() is called to get a textual description of the
+error.
+在 3.3 版更改: An instance of WindowsError used to be created.
+This function returns the wide character string starting at memory address
+address as a string.  If size is specified, it is used as the number of
+characters of the string, otherwise the string is assumed to be
+zero-terminated.
+Raises an auditing event ctypes.wstring_at with arguments address, size.
+This non-public class is the common base class of all ctypes data types.
+Among other things, all ctypes type instances contain a memory block that
+hold C compatible data; the address of the memory block is returned by the
+addressof() helper function. Another instance variable is exposed as
+_objects; this contains other Python objects that need to be kept
+alive in case the memory block contains pointers.
+Common methods of ctypes data types, these are all class methods (to be
+exact, they are methods of the metaclass):
+This method returns a ctypes instance that shares the buffer of the
+source object.  The source object must support the writeable buffer
+interface.  The optional offset parameter specifies an offset into the
+source buffer in bytes; the default is zero.  If the source buffer is not
+large enough a ValueError is raised.
+Raises an auditing event ctypes.cdata/buffer with arguments pointer, size, offset.
+This method creates a ctypes instance, copying the buffer from the
+source object buffer which must be readable.  The optional offset
+parameter specifies an offset into the source buffer in bytes; the default
+is zero.  If the source buffer is not large enough a ValueError is
+raised.
+Raises an auditing event ctypes.cdata/buffer with arguments pointer, size, offset.
+This method returns a ctypes type instance using the memory specified by
+address which must be an integer.
+
+This method, and others that indirectly call this method, raises an
+auditing event ctypes.cdata with argument
+address.
+This method adapts obj to a ctypes type.  It is called with the actual
+object used in a foreign function call when the type is present in the
+foreign function's argtypes tuple; it must return an object that
+can be used as a function call parameter.
+All ctypes data types have a default implementation of this classmethod
+that normally returns obj if that is an instance of the type.  Some
+types accept other objects as well.
+This method returns a ctypes type instance exported by a shared
+library. name is the name of the symbol that exports the data, library
+is the loaded shared library.
+Common instance variables of ctypes data types:
+Sometimes ctypes data instances do not own the memory block they contain,
+instead they share part of the memory block of a base object.  The
+_b_base_ read-only member is the root ctypes object that owns the
+memory block.
+This read-only variable is true when the ctypes data instance has
+allocated the memory block itself, false otherwise.
+This member is either None or a dictionary containing Python objects
+that need to be kept alive so that the memory block contents is kept
+valid.  This object is only exposed for debugging; never modify the
+contents of this dictionary.
+This non-public class is the base class of all fundamental ctypes data
+types. It is mentioned here because it contains the common attributes of the
+fundamental ctypes data types.  _SimpleCData is a subclass of
+_CData, so it inherits their methods and attributes. ctypes data
+types that are not and do not contain pointers can now be pickled.
+Instances have a single attribute:
+This attribute contains the actual value of the instance. For integer and
+pointer types, it is an integer, for character types, it is a single
+character bytes object or string, for character pointer types it is a
+Python bytes object or string.
+When the value attribute is retrieved from a ctypes instance, usually
+a new object is returned each time.  ctypes does not implement
+original object return, always a new object is constructed.  The same is
+true for all other ctypes object instances.
+Fundamental data types, when returned as foreign function call results, or, for
+example, by retrieving structure field members or array items, are transparently
+converted to native Python types.  In other words, if a foreign function has a
+restype of c_char_p, you will always receive a Python bytes
+object, not a c_char_p instance.
+Subclasses of fundamental data types do not inherit this behavior. So, if a
+foreign functions restype is a subclass of c_void_p, you will
+receive an instance of this subclass from the function call. Of course, you can
+get the value of the pointer by accessing the value attribute.
+These are the fundamental ctypes data types:
+Represents the C signed char datatype, and interprets the value as
+small integer.  The constructor accepts an optional integer initializer; no
+overflow checking is done.
+Represents the C char datatype, and interprets the value as a single
+character.  The constructor accepts an optional string initializer, the
+length of the string must be exactly one character.
+Represents the C char * datatype when it points to a zero-terminated
+string.  For a general character pointer that may also point to binary data,
+POINTER(c_char) must be used.  The constructor accepts an integer
+address, or a bytes object.
+Represents the C double datatype.  The constructor accepts an
+optional float initializer.
+Represents the C long double datatype.  The constructor accepts an
+optional float initializer.  On platforms where sizeof(long double) ==
+sizeof(double) it is an alias to c_double.
+Represents the C float datatype.  The constructor accepts an
+optional float initializer.
+Represents the C signed int datatype.  The constructor accepts an
+optional integer initializer; no overflow checking is done.  On platforms
+where sizeof(int) == sizeof(long) it is an alias to c_long.
+Represents the C 8-bit signed int datatype.  Usually an alias for
+c_byte.
+Represents the C 16-bit signed int datatype.  Usually an alias for
+c_short.
+Represents the C 32-bit signed int datatype.  Usually an alias for
+c_int.
+Represents the C 64-bit signed int datatype.  Usually an alias for
+c_longlong.
+Represents the C signed long datatype.  The constructor accepts an
+optional integer initializer; no overflow checking is done.
+Represents the C signed long long datatype.  The constructor accepts
+an optional integer initializer; no overflow checking is done.
+Represents the C signed short datatype.  The constructor accepts an
+optional integer initializer; no overflow checking is done.
+Represents the C size_t datatype.
+Represents the C ssize_t datatype.
+3.2 新版功能.
+Represents the C unsigned char datatype, it interprets the value as
+small integer.  The constructor accepts an optional integer initializer; no
+overflow checking is done.
+Represents the C unsigned int datatype.  The constructor accepts an
+optional integer initializer; no overflow checking is done.  On platforms
+where sizeof(int) == sizeof(long) it is an alias for c_ulong.
+Represents the C 8-bit unsigned int datatype.  Usually an alias for
+c_ubyte.
+Represents the C 16-bit unsigned int datatype.  Usually an alias for
+c_ushort.
+Represents the C 32-bit unsigned int datatype.  Usually an alias for
+c_uint.
+Represents the C 64-bit unsigned int datatype.  Usually an alias for
+c_ulonglong.
+Represents the C unsigned long datatype.  The constructor accepts an
+optional integer initializer; no overflow checking is done.
+Represents the C unsigned long long datatype.  The constructor
+accepts an optional integer initializer; no overflow checking is done.
+Represents the C unsigned short datatype.  The constructor accepts
+an optional integer initializer; no overflow checking is done.
+Represents the C void * type.  The value is represented as integer.
+The constructor accepts an optional integer initializer.
+Represents the C wchar_t datatype, and interprets the value as a
+single character unicode string.  The constructor accepts an optional string
+initializer, the length of the string must be exactly one character.
+Represents the C wchar_t * datatype, which must be a pointer to a
+zero-terminated wide character string.  The constructor accepts an integer
+address, or a string.
+Represent the C bool datatype (more accurately, _Bool from
+C99).  Its value can be True or False, and the constructor accepts any object
+that has a truth value.
+Windows only: Represents a HRESULT value, which contains success or
+error information for a function or method call.
+Represents the C PyObject * datatype.  Calling this without an
+argument creates a NULL PyObject * pointer.
+The ctypes.wintypes module provides quite some other Windows specific
+data types, for example HWND, WPARAM, or DWORD.  Some
+useful structures like MSG or RECT are also defined.
+Abstract base class for unions in native byte order.
+Abstract base class for structures in big endian byte order.
+Abstract base class for structures in little endian byte order.
+Structures with non-native byte order cannot contain pointer type fields, or any
+other data types containing pointer type fields.
+Abstract base class for structures in native byte order.
+Concrete structure and union types must be created by subclassing one of these
+types, and at least define a _fields_ class variable. ctypes will
+create descriptors which allow reading and writing the fields by direct
+attribute accesses.  These are the
+A sequence defining the structure fields.  The items must be 2-tuples or
+3-tuples.  The first item is the name of the field, the second item
+specifies the type of the field; it can be any ctypes data type.
+For integer type fields like c_int, a third optional item can be
+given.  It must be a small positive integer defining the bit width of the
+field.
+Field names must be unique within one structure or union.  This is not
+checked, only one field can be accessed when names are repeated.
+It is possible to define the _fields_ class variable after the
+class statement that defines the Structure subclass, this allows creating
+data types that directly or indirectly reference themselves:
+The _fields_ class variable must, however, be defined before the
+type is first used (an instance is created, sizeof() is called on it,
+and so on).  Later assignments to the _fields_ class variable will
+raise an AttributeError.
+It is possible to define sub-subclasses of structure types, they inherit
+the fields of the base class plus the _fields_ defined in the
+sub-subclass, if any.
+An optional small integer that allows overriding the alignment of
+structure fields in the instance.  _pack_ must already be defined
+when _fields_ is assigned, otherwise it will have no effect.
+An optional sequence that lists the names of unnamed (anonymous) fields.
+_anonymous_ must be already defined when _fields_ is
+assigned, otherwise it will have no effect.
+The fields listed in this variable must be structure or union type fields.
+ctypes will create descriptors in the structure type that allows
+accessing the nested fields directly, without the need to create the
+structure or union field.
+Here is an example type (Windows):
+The TYPEDESC structure describes a COM data type, the vt field
+specifies which one of the union fields is valid.  Since the u field
+is defined as anonymous field, it is now possible to access the members
+directly off the TYPEDESC instance. td.lptdesc and td.u.lptdesc
+are equivalent, but the former is faster since it does not need to create
+a temporary union instance:
+It is possible to define sub-subclasses of structures, they inherit the
+fields of the base class.  If the subclass definition has a separate
+_fields_ variable, the fields specified in this are appended to the
+fields of the base class.
+Structure and union constructors accept both positional and keyword
+arguments.  Positional arguments are used to initialize member fields in the
+same order as they are appear in _fields_.  Keyword arguments in the
+constructor are interpreted as attribute assignments, so they will initialize
+_fields_ with the same name, or create new attributes for names not
+present in _fields_.
+Abstract base class for arrays.
+The recommended way to create concrete array types is by multiplying any
+ctypes data type with a positive integer.  Alternatively, you can subclass
+this type and define _length_ and _type_ class variables.
+Array elements can be read and written using standard
+subscript and slice accesses; for slice reads, the resulting object is
+not itself an Array.
+A positive integer specifying the number of elements in the array.
+Out-of-range subscripts result in an IndexError. Will be
+returned by len().
+Specifies the type of each element in the array.
+Array subclass constructors accept positional arguments, used to
+initialize the elements in order.
+Private, abstract base class for pointers.
+Concrete pointer types are created by calling POINTER() with the
+type that will be pointed to; this is done automatically by
+pointer().
+If a pointer points to an array, its elements can be read and
+written using standard subscript and slice accesses.  Pointer objects
+have no size, so len() will raise TypeError.  Negative
+subscripts will read from the memory before the pointer (as in C), and
+out-of-range subscripts will probably crash with an access violation (if
+you're lucky).
+Specifies the type pointed to.
+Returns the object to which to pointer points.  Assigning to this
+attribute changes the pointer to point to the assigned object.
+errno --- 标准 errno 系统符号
+并发执行
+</body></doc>

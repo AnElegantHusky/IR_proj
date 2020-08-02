@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='utf-8'?>
+<doc><id>286</id><url>https://docs.python.org/zh-cn/3/library/urllib.html</url><title> --- URL 处理模块</title><body>源代码: Lib/urllib/
+urllib 是一个收集了多个涉及 URL 的模块的包：
+urllib.request 打开和读取 URL
+urllib.error 包含 urllib.request 抛出的异常
+urllib.parse  用于解析 URL
+urllib.robotparser 用于解析 robots.txt 文件
+wsgiref --- WSGI Utilities and Reference Implementation
+urllib.request --- 用于打开 URL 的可扩展库
+</body></doc>

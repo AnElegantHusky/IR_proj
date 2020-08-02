@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='utf-8'?>
+<doc><id>146</id><url>https://docs.python.org/zh-cn/3/library/fractions.html</url><title> --- 分数</title><body>源代码 Lib/fractions.py
+fractions 模块支持分数运算。
+分数实例可以由一对整数，一个分数，或者一个字符串构建而成。
+第一个版本要求 numerator 和 denominator 是 numbers.Rational 的实例，并返回一个新的 Fraction 实例，其值为 numerator/denominator。 如果 denominator 为 0 将会引发 ZeroDivisionError。 第二个版本要求 other_fraction 是 numbers.Rational 的实例，并返回一个 Fraction 实例且与传入值相等。 下两个版本接受 float 或 decimal.Decimal 的实例，并返回一个 Fraction 实例且与传入值完全相等。 请注意由于二进制浮点数通常存在的问题 (参见 浮点算术：争议和限制)，Fraction(1.1) 的参数并不会精确等于 11/10，因此 Fraction(1.1) 也 不会 返回用户所期望的 Fraction(11, 10)。 （请参阅下文中 limit_denominator() 方法的文档。） 构造器的最后一个版本接受一个字符串或 unicode 实例。 此实例的通常形式为:
+其中的可选项 sign 可以为 '+' 或 '-' 并且 numerator 和 denominator (如果存在) 是十进制数码的字符串。 此外，float 构造器所接受的任何表示一个有限值的字符串也都为 Fraction 构造器所接受。 不论哪种形式的输入字符串也都可以带有前缀和/或后缀的空格符。 这里是一些示例:
+Fraction 类继承自抽象基类 numbers.Rational，并实现了该类的所有方法和操作。 Fraction 实例是可哈希的，并应当被视为不可变对象。 此外，Fraction 还具有以下属性和方法：
+在 3.2 版更改: Fraction 构造器现在接受 float 和 decimal.Decimal 实例。
+最简分数形式的分子。
+最简分数形式的分母。
+返回由两个整数组成的元组，两数之比等于该分数的值且其分母为正数。
+3.8 新版功能.
+此类方法可构造一个 Fraction 来表示 flt 的精确值，该参数必须是一个 float。 请注意 Fraction.from_float(0.3) 的值并不等于 Fraction(3, 10)。
+注解
+从 Python 3.2 开始，在构造 Fraction 实例时可以直接使用 float。
+此类方法可构造一个 Fraction 来表示 dec 的精确值，该参数必须是一个 decimal.Decimal 实例。
+注解
+从 Python 3.2 开始，在构造 Fraction 实例时可以直接使用 decimal.Decimal 实例。
+找到并返回一个 Fraction 使得其值最接近 self 并且分母不大于 max_denominator。 此方法适用于找出给定浮点数的有理数近似值：
+或是用来恢复被表示为一个浮点数的有理数：
+返回最大的 int &lt;= self。 此方法也可通过 math.floor() 函数来使用：
+返回最小的 int &gt;= self。 此方法也可通过 math.ceil() 函数来使用。
+第一个版本返回一个 int 使得其值最接近 self，位值为二分之一时只对偶数舍入。第二个版本会将 self 舍入到最接近 Fraction(1, 10**ndigits) 的倍数（如果 ndigits 为负值则为逻辑运算），位值为二分之一时同样只对偶数舍入。 此方法也可通过 round() 函数来使用。
+返回整数 a 和 b 的最大公约数。如果 a 或 b 之一非零，则 gcd(a, b) 的绝对值是能同时整除 a 和 b 的最大整数。若 b 非零，则 gcd(a,b) 与 b 同号；否则返回值与 a 同号。gcd(0, 0) 返回 0。
+3.5 版后已移除: 由 math.gcd() 取代.
+参见
+构成数字塔的所有抽象基类。
+decimal --- 十进制定点和浮点运算
+random --- 生成伪随机数
+</body></doc>

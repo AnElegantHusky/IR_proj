@@ -1,0 +1,602 @@
+<?xml version='1.0' encoding='utf-8'?>
+<doc><id>483</id><url>https://docs.python.org/zh-cn/3/library/sys.html</url><title> --- 系统相关的参数和函数</title><body>该模块提供了一些变量和函数。这些变量可能被解释器使用，也可能由解释器提供。这些函数会影响解释器。本模块总是可用的。
+在POSIX系统上，以标准的 configure 脚本构建的 Python 中，这个变量会包含 PEP 3149 中定义的ABI标签。
+在 3.8 版更改: 默认的 flags 变为了空字符串（用于 pymalloc 的 m 旗标已经移除）
+3.2 新版功能.
+将可调用的 hook 附加到当前解释器的活动的审核钩子列表中。
+通过 sys.audit() 函数引发审计事件时，将按照加入钩子的先后顺序调用每个钩子，调用时将带有事件名称和参数元组。首先调用由 PySys_AddAuditHook() 添加的静态钩子，然后调用添加到当前解释器中的钩子。
+引发一个 审计事件 sys.addaudithook，没有附带参数。
+3.8 新版功能.
+在 3.8.1 版更改: 派生自 Exception （而非 RuntimeError ）的异常不会被抑制。
+CPython implementation detail: 启用跟踪时（参阅 settrace() ），仅当可调用对象（钩子）的 __cantrace__ 成员设置为 true 时，才会跟踪该钩子。否则，跟踪功能将跳过该钩子。
+一个列表，其中包含了被传递给 Python 脚本的命令行参数。 argv[0] 为脚本的名称（是否是完整的路径名取决于操作系统）。如果是通过 Python 解释器的命令行参数 -c 来执行的， argv[0] 会被设置成字符串 '-c' 。如果没有脚本名被传递给 Python 解释器， argv[0] 为空字符串。
+为了遍历标准输入，或者通过命令行传递的文件列表，参照 fileinput 模块
+注解
+在 Unix 上，系统传递的命令行参数是字节类型的。Python 使用文件系统编码和 "surrogateescape" 错误处理程序对它们进行解码。当需要原始字节时，可以通过 [os.fsencode(arg) for arg in sys.argv] 来获取。
+利用某些活动的钩子引发审计事件。事件名称是一个字符串，用于标记事件及其关联的架构（即参数的数量和类型）。给定事件的架构应视作公开且稳定的 API，并且不应在版本之间进行修改。
+任何钩子抛出第一个异常时，此函数也将抛出该异常。通常不应处理这些错误，而应尽快终止该进程。
+钩子程序由 sys.addaudithook() 或 PySys_AddAuditHook() 函数添加。
+与本函数相等效的原生函数是 PySys_Audit()，应尽量使用原生函数。
+参阅 审计事件表 以获取 CPython 定义的所有审计事件。
+3.8 新版功能.
+在 site.py 运行之前， Python 启动的时候被设置为跟 exec_prefix 同样的值。如果不是运行在 虚拟环境 中，两个值会保持相同；如果 site.py 发现处于一个虚拟环境中， prefix 和 exec_prefix 将会指向虚拟环境。然而 base_prefix 和 base_exec_prefix 将仍然会指向基础的 Python 环境（用来创建虚拟环境的 Python 环境）
+3.3 新版功能.
+在 site.py 运行之前， Python 启动的时候被设置为跟 prefix 同样的值。如果不是运行在 虚拟环境 中, 两个值会保持相同；如果 site.py 发现处于一个虚拟环境中， prefix 和 exec_prefix 将会指向虚拟环境。然而 base_prefix 和 base_exec_prefix 将仍然会指向基础的 Python 环境（用来创建虚拟环境的 Python 环境）
+3.3 新版功能.
+本地字节顺序的指示符。在大端序（最高有效位优先）操作系统上值为 'big' ，在小端序（最低有效位优先）操作系统上为 'little' 。
+一个元素为字符串的元组。包含了所有的被编译进 Python 解释器的模块。（这个信息无法通过其他的办法获取， modules.keys() 只包括被导入过的模块。）
+在启用跟踪时调用 func(*args)  来保存跟踪状态，然后恢复跟踪状态。这将从检查点的调试器调用，以便递归地调试其他的一些代码。
+一个字符串，包含了 Python 解释器有关的版权信息
+清除内部的类型缓存。类型缓存是为了加速查找方法和属性的。在调试引用泄漏的时候调用这个函数 只会 清除不必要的引用。
+这个函数应该只在内部为了一些特定的目的使用。
+返回一个字典，存放着每个线程的标识符与（调用本函数时）该线程栈顶的帧（当前活动的帧）之间的映射。注意 traceback 模块中的函数可以在给定某一帧的情况下构建调用堆栈。
+这对于调试死锁最有用：本函数不需要死锁线程的配合，并且只要这些线程的调用栈保持死锁，它们就是冻结的。在调用本代码来检查栈顶的帧的那一刻，非死锁线程返回的帧可能与该线程当前活动的帧没有任何关系。
+这个函数应该只在内部为了一些特定的目的使用。
+引发一个 审计事件 sys._current_frames，没有附带参数。
+本钩子函数由内建函数 breakpoint() 调用。默认情况下，它将进入 pdb 调试器，但可以将其改为任何其他函数，以选择使用哪个调试器。
+该函数的特征取决于其调用的函数。例如，默认绑定（即 pdb.set_trace() ）不要求提供参数，但可以将绑定换成要求提供附加参数（位置参数/关键字参数）的函数。内建函数 breakpoint() 直接将其 *args 和 **kws 传入。breakpointhooks() 返回的所有内容都会从 breakpoint() 返回。
+默认的实现首先会查询环境变量 PYTHONBREAKPOINT。如果将该变量设置为 "0"，则本函数立即返回，表示在断点处无操作。如果未设置该环境变量或将其设置为空字符串，则调用 pdb.set_trace()。否则，此变量应指定要运行的函数，指定函数时应使用 Python 的点导入命名法，如 package.subpackage.module.function。这种情况下将导入 package.subpackage.module，且导入的模块必须有一个名为 function() 的可调用对象。该可调用对象会运行，*args 和 **kws 会传入，且无论 function() 返回什么，sys.breakpointhook() 都将返回到內建函数 breakpoint()。
+注意，如果在导入 PYTHONBREAKPOINT 指定的可调用对象时出错，则将报告一个 RuntimeWarning 并忽略断点。
+另请注意，如果以编程方式覆盖 sys.breakpointhook()，则 不会 查询 PYTHONBREAKPOINT。
+3.7 新版功能.
+将有关 CPython 内存分配器状态的底层的信息打印至 stderr。
+如果 Python 被配置为 --with-pydebug，本方法还将执行一些开销较大的内部一致性检查。
+3.3 新版功能.
+CPython implementation detail: 本函数仅限 CPython。此处没有定义确切的输出格式，且可能会更改。
+指向 Python DLL 句柄的整数。
+可用性: Windows。
+如果 value 不是 None，则本函数会将 repr(value) 打印至 sys.stdout，并将 value 保存在 builtins._ 中。如果 repr(value) 无法用 sys.stdout.errors 错误回调方法（可能较为“严格”）编码为 sys.stdout.encoding，请用 'backslashreplace' 错误回调方法将其编码为 sys.stdout.encoding。
+在交互式 Python 会话中运行 expression 产生结果后，将在结果上调用 sys.displayhook。若要自定义这些 value 的显示，可以将 sys.displayhook 指定为另一个单参数函数。
+伪代码:
+在 3.2 版更改: 在发生 UnicodeEncodeError 时使用 'backslashreplace' 错误回调方法。
+如果该值为 true，则 Python 在导入源码模块时将不会尝试写入 .pyc 文件。该值会被初始化为 True 或 False，依据是 -B 命令行选项和 PYTHONDONTWRITEBYTECODE 环境变量，可以自行设置该值，来控制是否生成字节码文件。
+如果将该选项设为某个目录（不是 None ），Python 会将字节码缓存文件 .pyc 写入到以该目录为根的并行目录树中（并从中读取），而不是在源码树中的 __pycache__ 目录下读写。源码树中所有的 __pycache__ 目录都将被忽略，并将在 pycache prefix 内写入新的 .pyc 文件。因此，如果使用 compileall 作为预构建步骤，则必须确保预构建时使用的 pycache prefix （如果有）与将来运行的时候相同。
+相对路径将解释为相对于当前工作目录。
+该值的初值设置，依据 -X pycache_prefix=PATH 命令行选项或 PYTHONPYCACHEPREFIX 环境变量的值（命令行优先）。如果两者均未设置，则为 None。
+3.8 新版功能.
+本函数会将所给的回溯和异常输出到 sys.stderr 中。
+当抛出一个异常，且未被捕获时，解释器将调用 sys.excepthook 并带有三个参数：异常类、异常实例和一个回溯对象。在交互式会话中，这会在控制权返回到提示符之前发生。在 Python 程序中，这会在程序退出之前发生。如果要自定义此类顶级异常的处理过程，可以将另一个 3 个参数的函数赋给 sys.excepthook。
+引发一个 审计事件 sys.excepthook，附带参数 hook, type, value, traceback。
+参见
+sys.unraisablehook() 函数处理无法抛出的异常，threading.excepthook() 函数处理 threading.Thread.run() 抛出的异常。
+程序开始时，这些对象存有 breakpointhook、displayhook、excepthook 和 unraisablehook 的初始值。保存它们是为了可以在 breakpointhook、displayhook 和 excepthook、unraisablehook 被破坏或被替换时恢复它们。
+3.7 新版功能: __breakpointhook__
+3.8 新版功能: __unraisablehook__
+本函数返回的元组包含三个值，它们给出当前正在处理的异常的信息。返回的信息仅限于当前线程和当前堆栈帧。如果当前堆栈帧没有正在处理的异常，则信息将从调用的下级堆栈帧或上级调用者等位置获取，依此类推，直到找到正在处理异常的堆栈帧为止。此处的“处理异常”被定义为“执行 except 子句”。任何堆栈帧都只能访问当前正在处理的异常的信息。
+如果整个堆栈都没有正在处理的异常，则返回包含三个 None 值的元组。否则返回值为 (type, value, traceback)。它们的含义是：type 是正在处理的异常类型（它是 BaseException 的子类）；value 是异常实例（异常类型的实例）；traceback 是一个 回溯对象，该对象封装了最初发生异常时的调用堆栈。
+一个字符串，给出特定域的目录前缀，该目录中安装了与平台相关的 Python 文件，默认也是 '/usr/local'。该目录前缀可以在构建时使用 configure 脚本的 --exec-prefix 参数进行设置。具体而言，所有配置文件（如 pyconfig.h 头文件）都安装在目录 exec_prefix/lib/pythonX.Y/config 中，共享库模块安装在 exec_prefix/lib/pythonX.Y/lib-dynload 中，其中 X.Y 是 Python 的版本号，如 3.2。
+注解
+如果在一个 虚拟环境 中，那么该值将在 site.py 中被修改，指向虚拟环境。Python 安装位置仍然可以用 base_exec_prefix 来获取。
+一个字符串，提供 Python 解释器的可执行二进制文件的绝对路径，仅在部分系统中此值有意义。如果 Python 无法获取其可执行文件的真实路径，则 sys.executable 将为空字符串或 None。
+从Python中退出。实现方式是抛出一个 SystemExit 异常。异常抛出后 try 声明的 finally 分支语句的清除动作将被出发。此动作有可能打断更外层的退出尝试。
+可选参数 arg 可以是表示退出状态的整数（默认为 0），也可以是其他类型的对象。如果它是整数，则 shell 等将 0 视为“成功终止”，非零值视为“异常终止”。大多数系统要求该值的范围是 0--127，否则会产生不确定的结果。某些系统为退出代码约定了特定的含义，但通常尚不完善；Unix 程序通常用 2 表示命令行语法错误，用 1 表示所有其他类型的错误。传入其他类型的对象，如果传入 None 等同于传入 0，如果传入其他对象则将其打印至 stderr，且退出代码为 1。特别地，sys.exit("some error message") 可以在发生错误时快速退出程序。
+由于 exit() 最终“只是”抛出一个异常，因此当从主线程调用时，只会从进程退出；而异常不会因此被打断。
+在 3.6 版更改: 在 Python 解释器捕获 SystemExit 后，如果在清理中发生错误（如清除标准流中的缓冲数据时出错），则退出状态码将变为 120。
+具名元组 flags 含有命令行标志的状态。这些属性是只读的。
+attribute -- 属性
+标志
+debug
+-d
+inspect
+-i
+interactive
+-i
+isolated
+-I
+optimize
+-O 或 -OO
+dont_write_bytecode
+-B
+no_user_site
+-s
+no_site
+-S
+ignore_environment
+-E
+verbose
+-v
+bytes_warning
+-b
+quiet
+-q
+hash_randomization
+-R
+dev_mode
+-X dev
+utf8_mode
+-X utf8
+在 3.2 版更改: 为新的 -q 标志添加了 quiet 属性
+3.2.3 新版功能: hash_randomization 属性
+在 3.3 版更改: 删除了过时的 division_warning 属性
+在 3.4 版更改: 为 -I isolated 标志添加了 isolated 属性。
+在 3.7 版更改: Added dev_mode attribute for the new -X dev flag
+and utf8_mode attribute for the new  -X utf8 flag.
+一个 具名元组，存有浮点型的相关信息。它包含的是关于精度和内部表示的底层信息。这些值与标准头文件 float.h 中为 C 语言定义的各种浮点常量对应，详情请参阅 1999 ISO/IEC C 标准 [C99] 的 5.2.4.2.2 节，'Characteristics of floating types（浮点型的特性）'。
+attribute -- 属性
+float.h 宏
+说明
+epsilon
+DBL_EPSILON
+大于 1.0 的最小值和 1.0 之间的差，表示为浮点数
+dig
+DBL_DIG
+浮点数可以真实表示的最大十进制数字；见下文
+mant_dig
+DBL_MANT_DIG
+浮点数精度：radix 基数下的浮点数有效位数
+max
+DBL_MAX
+最大可表示的正有限浮点数
+max_exp
+DBL_MAX_EXP
+使得 radix**(e-1) 是可表示的浮点数（非无穷）的最大整数 e
+max_10_exp
+DBL_MAX_10_EXP
+使得 10**e 在可表示的浮点数（非无穷）范围内的最大整数 e
+min
+DBL_MIN
+可表示的最小正 规格化 浮点数
+min_exp
+DBL_MIN_EXP
+使得 radix**(e-1) 是规格化浮点数的最小整数 e
+min_10_exp
+DBL_MIN_10_EXP
+使得 10**e 是规格化浮点数的最小整数 e
+radix
+FLT_RADIX
+指数表示法中采用的基数
+rounds
+FLT_ROUNDS
+整数常数，表示算术运算中的舍入方式。它反映了解释器启动时系统的 FLT_ROUNDS 宏的值。关于可能的值及其含义的说明，请参阅 C99 标准 5.2.4.2.2 节。
+关于 sys.float_info.dig 属性的进一步说明。如果 s 是表示十进制数的字符串，而该数最多有 sys.float_info.dig 位有效数字，则将 s 转换为 float 再转回去将恢复原先相同十进制值的字符串:
+但是对于超过 sys.float_info.dig 位有效数字的字符串，转换前后并非总是相同:
+一个字符串，反映 repr() 函数在浮点数上的行为。如果该字符串是 'short'，那么对于（非无穷的）浮点数 x，repr(x) 将会生成一个短字符串，满足 float(repr(x)) == x 的特性。这是 Python 3.1 及更高版本中的常见行为。否则 float_repr_style 的值将是 'legacy'，此时 repr(x) 的行为方式将与 Python 3.1 之前的版本相同。
+3.1 新版功能.
+返回解释器当前已分配的内存块数，无论它们大小如何。本函数主要用于跟踪和调试内存泄漏。因为解释器有内部缓存，所以不同调用之间结果会变化。可能需要调用 _clear_type_cache() 和 gc.collect() 使结果更容易预测。
+如果当前 Python 构建或实现无法合理地计算此信息，允许 getallocatedblocks() 返回 0。
+3.4 新版功能.
+返回一个整数，表示 Android 构建时 API 版本。
+可用性：Android。
+3.7 新版功能.
+Return the interpreter's "check interval"; see setcheckinterval().
+3.2 版后已移除: Use getswitchinterval() instead.
+返回当前 Unicode 实现所使用的默认字符串编码名称。
+返回当前 dlopen() 调用所使用的标志位的值。标志值对应的符号名称可以在 os 模块中找到（形如 RTLD_xxx 的常量，如 os.RTLD_LAZY ）。
+可用性: Unix。
+返回编码名称，该编码用于在 Unicode 文件名和 bytes 文件名之间转换。为获得最佳兼容性，任何时候都应使用 str 表示文件名，尽管用字节来表示文件名也是支持的。函数如果需要接受或返回文件名，它应支持 str 或 bytes，并在内部将其转换为系统首选的表示形式。
+该编码始终是 ASCII 兼容的。
+应使用 os.fsencode() 和 os.fsdecode() 来保证所采用的编码和错误模式都是正确的。
+在UTF-8模式下，任何平台上的编码均为 utf-8 。
+在macOS上，编码为 'utf-8'。
+在Unix上，编码是语言环境编码。
+在Windows上取决于用户配置，编码可能是 'utf-8' 或 'mbcs'。
+在Android上，编码为 'utf-8'。
+在VxWorks上，编码为 'utf-8'。
+在 3.2 版更改: getfilesystemencoding() 的结果将不再有可能是 None。
+在 3.6 版更改: Windows 不再保证会返回 'mbcs'。详情请参阅 PEP 529 和 _enablelegacywindowsfsencoding()。
+在 3.7 版更改: 在UTF-8模式下返回 'utf-8' 。
+返回错误回调函数的名称，该错误回调函数将在 Unicode 文件名和 bytes 文件名转换时生效。编码的名称是由 getfilesystemencoding() 返回的。
+应使用 os.fsencode() 和 os.fsdecode() 来保证所采用的编码和错误模式都是正确的。
+3.6 新版功能.
+返回 object 的引用计数。返回的计数通常比预期的多一，因为它包括了作为 getrefcount() 参数的这一次（临时）引用。
+返回当前的递归限制值，即 Python 解释器堆栈的最大深度。此限制可防止无限递归导致的 C 堆栈溢出和 Python 崩溃。该值可以通过 setrecursionlimit() 设置。
+返回对象的大小（以字节为单位）。该对象可以是任何类型。所有内建对象返回的结果都是正确的，但对于第三方扩展不一定正确，因为这与具体实现有关。
+只计算直接分配给对象的内存消耗，不计算它所引用的对象的内存消耗。
+对象不提供计算大小的方法时，如果有给出 default 则返回它，否则抛出 TypeError 异常。
+如果对象由垃圾回收器管理，则 getsizeof() 将调用对象的 __sizeof__ 方法，并在上层添加额外的垃圾回收器。
+可以参考 recursive sizeof recipe 中的示例，关于递归调用 getsizeof() 来得到各个容器及其所有内容物的大小。
+返回解释器的“线程切换间隔时间”，请参阅 setswitchinterval()。
+3.2 新版功能.
+返回来自调用栈的一个帧对象。如果传入可选整数 depth，则返回从栈顶往下相应调用层数的帧对象。如果该数比调用栈更深，则抛出 ValueError。depth 的默认值是 0，返回调用栈顶部的帧。
+引发一个 审计事件 sys._getframe，没有附带参数。
+CPython implementation detail: 这个函数应该只在内部为了一些特定的目的使用。不保证它在所有 Python 实现中都存在。
+返回由 setprofile() 设置的性能分析函数
+返回由 settrace() 设置的跟踪函数。
+CPython implementation detail: gettrace() 函数仅用于实现调试器，性能分析器，打包工具等。它的行为是实现平台的一部分，而不是语言定义的一部分，因此并非在所有 Python 实现中都可用。
+返回一个具名元组，描述当前正在运行的 Windows 版本。元素名称包括 major, minor, build, platform, service_pack, service_pack_minor, service_pack_major, suite_mask, product_type 和 platform_version。service_pack 包含一个字符串，platform_version 包含一个三元组，其他所有值都是整数。元素也可以通过名称来访问，所以 sys.getwindowsversion()[0] 与 sys.getwindowsversion().major 是等效的。为保持与旧版本的兼容性，只有前 5 个元素可以用索引检索。
+platform 将会是 2 (VER_PLATFORM_WIN32_NT)。
+product_type 可能是以下值之一：
+常数
+含义
+1 (VER_NT_WORKSTATION)
+系统是工作站。
+2 (VER_NT_DOMAIN_CONTROLLER)
+系统是域控制器。
+3 (VER_NT_SERVER)
+系统是服务器，但不是域控制器。
+本函数包装了 Win32 GetVersionEx() 函数，参阅 Microsoft 文档有关 OSVERSIONINFOEX() 的内容可获取这些字段的更多信息。
+platform_version 返回的是当前操作系统真实准确的主要版本、次要版本和内部版本号，不是为该进程模拟的版本。它旨在用于记录日志，不用于检测功能。
+可用性: Windows。
+在 3.2 版更改: 更改为具名元组，添加 service_pack_minor, service_pack_major, suite_mask 和 product_type。
+在 3.6 版更改: 添加了 platform_version
+返回一个 asyncgen_hooks 对象，该对象类似于 namedtuple，形式为 (firstiter, finalizer)，其中 firstiter 和 finalizer 为 None 或函数，函数以 异步生成器迭代器 作为参数，并用于在事件循环中干预异步生成器的终结。
+3.6 新版功能: 详情请参阅 PEP 525。
+注解
+本函数已添加至暂定软件包（详情请参阅 PEP 411 ）。
+获取由 set_coroutine_origin_tracking_depth() 设置的协程来源的追踪深度。
+3.7 新版功能.
+注解
+本函数已添加至暂定软件包（详情请参阅 PEP 411 ）。仅将其用于调试目的。
+一个 具名元组，给出数字类型的哈希的实现参数。关于数字类型的哈希的详情请参阅 数字类型的哈希运算。
+attribute -- 属性
+说明
+width
+用于哈希值的位宽度
+modulus
+用于数字散列方案的素数模数P。
+inf
+为正无穷大返回的哈希值
+nan
+为nan返回的哈希值
+imag
+用于复数虚部的乘数
+algorithm
+字符串、字节和内存视图的哈希算法的名称
+hash_bits
+哈希算法的内部输出大小。
+seed_bits
+散列算法的种子密钥的大小
+3.2 新版功能.
+在 3.4 版更改: 添加了 algorithm, hash_bits 和 seed_bits
+编码为单个整数的版本号。该整数会确保每个版本都自增，其中适当包括了未发布版本。举例来说，要测试 Python 解释器的版本不低于 1.5.2，请使用:
+之所以称它为 hexversion，是因为只有将它传入内置函数 hex() 后，其结果才看起来有意义。也可以使用 具名元组 sys.version_info，它对相同信息有着更人性化的编码。
+关于 hexversion 的更多信息可以在 API 和 ABI 版本管理 中找到。
+一个对象，该对象包含当前运行的 Python 解释器的实现信息。所有 Python 实现中都必须存在下列属性。
+name 是当前实现的标识符，如 'cpython'。实际的字符串由 Python 实现定义，但保证是小写字母。
+version 是一个具名元组，格式与 sys.version_info 相同。它表示 Python 实现 的版本。 另一个（由 sys.version_info 表示）是当前解释器遵循的相应 Python 语言 的版本，两者具有不同的含义。 例如，对于 PyPy 1.8，sys.implementation.version 可能是 sys.version_info(1, 8, 0, 'final', 0)，而 sys.version_info 则是 sys.version_info(2, 7, 2, 'final', 0)。对于 CPython 而言两个值是相同的，因为它是参考实现。
+hexversion 是十六进制的实现版本，类似于 sys.hexversion。
+cache_tag 是导入机制使用的标记，用于已缓存模块的文件名。按照惯例，它将由实现的名称和版本组成，如 'cpython-33'。但如果合适，Python 实现可以使用其他值。如果 cache_tag 被置为 None，表示模块缓存已禁用。
+sys.implementation 可能包含相应 Python 实现的其他属性。这些非标准属性必须以下划线开头，此处不详细阐述。无论其内容如何，sys.implementation 在解释器运行期间或不同实现版本之间都不会更改。（但是不同 Python 语言版本间可能会不同。）详情请参阅 PEP 421。
+3.3 新版功能.
+注解
+新的必要属性的添加必须经过常规的 PEP 过程。详情请参阅 PEP 421。
+一个 具名元组，包含 Python 内部整数表示形式的信息。这些属性是只读的。
+属性
+说明
+bits_per_digit
+每个数字占有的位数。Python 内部将整数存储在基底 2**int_info.bits_per_digit
+sizeof_digit
+用于表示数字的C类型的字节大小
+3.1 新版功能.
+当本属性存在，则以 交互模式 启动解释器时，将自动（不带参数地）调用本属性的值。该过程是在读取 PYTHONSTARTUP 文件之后完成的，所以可以在该文件中设置这一钩子。site 模块 设置了这一属性。
+引发一个 审计事件 cpython.run_interactivehook，附带参数 hook。
+3.4 新版功能.
+将 string 插入 "interned" （驻留）字符串表，返回被插入的字符串 -- 它是 string 本身或副本。驻留字符串对提高字典查找的性能很有用 -- 如果字典中的键已驻留，且所查找的键也已驻留，则键（取散列后）的比较可以用指针代替字符串来比较。通常，Python 程序使用到的名称会被自动驻留，且用于保存模块、类或实例属性的字典的键也已驻留。
+驻留字符串不是永久存在的，对 intern() 返回值的引用必须保留下来，才能发挥驻留字符串的优势。
+如果 Python 解释器 正在关闭，则返回 True，否则返回 False。
+3.5 新版功能.
+这三个变量并非总是有定义，仅当有异常未处理，且解释器打印了错误消息和堆栈回溯时，才会给它们赋值。它们的预期用途，是允许交互中的用户导入调试器模块，进行事后调试，而不必重新运行导致错误的命令。（通常使用 import pdb; pdb.pm() 进入事后调试器，详情请参阅 pdb 模块。）
+这些变量的含义与上述 exc_info() 返回值的含义相同。
+一个整数，表示 Py_ssize_t 类型的变量可以取到的最大值。在 32 位平台上通常为 2**31 - 1，在 64 位平台上通常为 2**63 - 1。
+一个整数，表示最大的 Unicode 码点值，如 1114111 （十六进制为 0x10FFFF ）。
+在 3.3 版更改: 在 PEP 393 之前，sys.maxunicode 曾是 0xFFFF 或 0x10FFFF，具体取决于配置选项，该选项指定将 Unicode 字符存储为 UCS-2 还是 UCS-4。
+一个由 元路径查找器 对象组成的列表，当查找需要导入的模块时，会调用这些对象的 find_spec() 方法，观察这些对象是否能找到所需模块。调用 find_spec() 方法最少需要传入待导入模块的绝对名称。如果待导入模块包含在一个包中，则父包的 __path__ 属性将作为第二个参数被传入。该方法返回 模块规格，找不到模块则返回 None。
+参见
+抽象基类，定义了 meta_path 内的查找器对象的接口。
+find_spec() 返回的实例所对应的具体类。
+在 3.4 版更改: 在 Python 3.4 中通过 PEP 451 引入了 模块规格。早期版本的 Python 会寻找一个称为 find_module() 的方法。如果某个 meta_path 条目没有 find_spec() 方法，就会回退去调用前一种方法。
+一个字典，将模块名称映射到已加载的模块。可以操作该字典来强制重新加载模块，或是实现其他技巧。但是，替换的字典不一定会按预期工作，并且从字典中删除必要的项目可能会导致 Python 崩溃。
+一个由字符串组成的列表，用于指定模块的搜索路径。初始化自环境变量 PYTHONPATH，再加上一条与安装有关的默认路径。
+程序启动时将初始化该列表，列表的第一项 path[0] 目录含有调用 Python 解释器的脚本。如果脚本目录不可用（比如以交互方式调用了解释器，或脚本是从标准输入中读取的），则 path[0] 为空字符串，这将导致 Python 优先搜索当前目录中的模块。注意，脚本目录将插入在 PYTHONPATH 的条目*之前*。
+程序可以随意修改本列表用于自己的目的。只能向 sys.path 中添加 string 和 bytes 类型，其他数据类型将在导入期间被忽略。
+参见
+site 模块，该模块描述了如何使用 .pth 文件来扩展 sys.path。
+一个由可调用对象组成的列表，这些对象接受一个路径作为参数，并尝试为该路径创建一个 查找器。如果成功创建查找器，则可调用对象将返回它，否则将引发 ImportError 异常。
+本特性最早在 PEP 302 中被提及。
+一个字典，作为 查找器 对象的缓存。key 是传入 sys.path_hooks 的路径，value 是相应已找到的查找器。如果路径是有效的文件系统路径，但在 sys.path_hooks 中未找到查找器，则存入 None。
+本特性最早在 PEP 302 中被提及。
+在 3.3 版更改: 未找到查找器时，改为存储 None，而不是 imp.NullImporter。
+本字符串是一个平台标识符，举例而言，该标识符可用于将特定平台的组件追加到 sys.path 中。
+对于 Unix 系统（除 Linux 和 AIX 外），该字符串是 Python 构建时的 uname -s 返回的小写操作系统名称，并附加了 uname -r 返回的系统版本的第一部分，如 'sunos5' 或 'freebsd8'。除非需要检测特定版本的系统，否则建议使用以下习惯用法:
+对于其他系统，值是：
+系统
+平台 值
+AIX
+'aix'
+Linux
+'linux'
+Windows
+'win32'
+Windows/Cygwin
+'cygwin'
+macOS
+'darwin'
+在 3.3 版更改: 在 Linux 上，sys.platform 将不再包含副版本号。它将总是 'linux' 而不是 'linux2' 或 'linux3'。由于旧版本的 Python 会包含该版本号，因此推荐总是使用上述 startswith 习惯用法。
+在 3.8 版更改: 在 AIX 上，sys.platform 将不再包含副版本号。它将总是 'aix' 而不是 'aix5' 或 'aix7'。由于旧版本的 Python 会包含该版本号，因此推荐总是使用上述 startswith 习惯用法。
+参见
+os.name 更加简略。os.uname() 提供系统的版本信息。
+platform 模块对系统的标识有更详细的检查。
+A string giving the site-specific directory prefix where the platform
+independent Python files are installed; by default, this is the string
+'/usr/local'.  This can be set at build time with the --prefix
+argument to the configure script.  The main collection of Python
+library modules is installed in the directory prefix/lib/pythonX.Y
+while the platform independent header files (all except pyconfig.h) are
+stored in prefix/include/pythonX.Y, where X.Y is the version
+number of Python, for example 3.2.
+注解
+If a virtual environment is in effect, this
+value will be changed in site.py to point to the virtual
+environment. The value for the Python installation will still be
+available, via base_prefix.
+Strings specifying the primary and secondary prompt of the interpreter.  These
+are only defined if the interpreter is in interactive mode.  Their initial
+values in this case are '&gt;&gt;&gt; ' and '... '.  If a non-string object is
+assigned to either variable, its str() is re-evaluated each time the
+interpreter prepares to read a new interactive command; this can be used to
+implement a dynamic prompt.
+Set the interpreter's "check interval".  This integer value determines how often
+the interpreter checks for periodic things such as thread switches and signal
+handlers.  The default is 100, meaning the check is performed every 100
+Python virtual instructions. Setting it to a larger value may increase
+performance for programs using threads.  Setting it to a value &lt;= 0 checks
+every virtual instruction, maximizing responsiveness as well as overhead.
+3.2 版后已移除: This function doesn't have an effect anymore, as the internal logic for
+thread switching and asynchronous tasks has been rewritten.  Use
+setswitchinterval() instead.
+Set the flags used by the interpreter for dlopen() calls, such as when
+the interpreter loads extension modules.  Among other things, this will enable a
+lazy resolving of symbols when importing a module, if called as
+sys.setdlopenflags(0).  To share symbols across extension modules, call as
+sys.setdlopenflags(os.RTLD_GLOBAL).  Symbolic names for the flag values
+can be found in the os module (RTLD_xxx constants, e.g.
+os.RTLD_LAZY).
+可用性: Unix。
+设置系统的性能分析函数，该函数使得在 Py​​thon 中能够实现一个 Python 源代码性能分析器。关于 Python Profiler 的更多信息请参阅 Python Profilers 分析器 章节。性能分析函数的调用方式类似于系统的跟踪函数（参阅 settrace() ），但它是通过不同的事件调用的，例如，不是每执行一行代码就调用它一次（仅在调用某函数和从某函数返回时才会调用性能分析函数，但即使某函数发生异常也会算作返回事件）。该函数是特定于线程的，但是性能分析器无法得知线程之间的上下文切换，因此在存在多个线程的情况下使用它是没有意义的。另外，因为它的返回值不会被用到，所以可以简单地返回 None。性能分析函数中的错误将导致其自身被解除设置。
+性能分析函数应接收三个参数：frame、event 和 arg。frame 是当前的堆栈帧。event 是一个字符串：'call'、'return'、'c_call'、'c_return' 或 'c_exception'。arg 取决于事件类型。
+引发一个 审计事件 sys.setprofile，不附带任何参数。
+这些事件具有以下含义：
+A function is called (or some other code block entered).  The
+profile function is called; arg is None.
+A function (or other code block) is about to return.  The profile
+function is called; arg is the value that will be returned, or None
+if the event is caused by an exception being raised.
+A C function is about to be called.  This may be an extension function or
+a built-in.  arg is the C function object.
+A C function has returned. arg is the C function object.
+A C function has raised an exception.  arg is the C function object.
+Set the maximum depth of the Python interpreter stack to limit.  This limit
+prevents infinite recursion from causing an overflow of the C stack and crashing
+Python.
+The highest possible limit is platform-dependent.  A user may need to set the
+limit higher when they have a program that requires deep recursion and a platform
+that supports a higher limit.  This should be done with care, because a too-high
+limit can lead to a crash.
+If the new limit is too low at the current recursion depth, a
+RecursionError exception is raised.
+在 3.5.1 版更改: A RecursionError exception is now raised if the new limit is too
+low at the current recursion depth.
+设置解释器的线程切换间隔时间（单位为秒）。该浮点数决定了“时间片”的理想持续时间，时间片将分配给同时运行的 Python 线程。请注意，实际值可能更高，尤其是使用了运行时间长的内部函数或方法时。同时，在时间间隔末尾调度哪个线程是操作系统的决定。解释器没有自己的调度程序。
+3.2 新版功能.
+Set the system's trace function, which allows you to implement a Python
+source code debugger in Python.  The function is thread-specific; for a
+debugger to support multiple threads, it must register a trace function using
+settrace() for each thread being debugged or use threading.settrace().
+Trace functions should have three arguments: frame, event, and
+arg. frame is the current stack frame.  event is a string: 'call',
+'line', 'return', 'exception' or 'opcode'.  arg depends on
+the event type.
+The trace function is invoked (with event set to 'call') whenever a new
+local scope is entered; it should return a reference to a local trace
+function to be used for the new scope, or None if the scope shouldn't be
+traced.
+The local trace function should return a reference to itself (or to another
+function for further tracing in that scope), or None to turn off tracing
+in that scope.
+If there is any error occurred in the trace function, it will be unset, just
+like settrace(None) is called.
+这些事件具有以下含义：
+A function is called (or some other code block entered).  The
+global trace function is called; arg is None; the return value
+specifies the local trace function.
+The interpreter is about to execute a new line of code or re-execute the
+condition of a loop.  The local trace function is called; arg is
+None; the return value specifies the new local trace function.  See
+Objects/lnotab_notes.txt for a detailed explanation of how this
+works.
+Per-line events may be disabled for a frame by setting
+f_trace_lines to False on that frame.
+A function (or other code block) is about to return.  The local trace
+function is called; arg is the value that will be returned, or None
+if the event is caused by an exception being raised.  The trace function's
+return value is ignored.
+An exception has occurred.  The local trace function is called; arg is a
+tuple (exception, value, traceback); the return value specifies the
+new local trace function.
+The interpreter is about to execute a new opcode (see dis for
+opcode details).  The local trace function is called; arg is
+None; the return value specifies the new local trace function.
+Per-opcode events are not emitted by default: they must be explicitly
+requested by setting f_trace_opcodes to True on the
+frame.
+Note that as an exception is propagated down the chain of callers, an
+'exception' event is generated at each level.
+For more fine-grained usage, it's possible to set a trace function by
+assigning frame.f_trace = tracefunc explicitly, rather than relying on
+it being set indirectly via the return value from an already installed
+trace function. This is also required for activating the trace function on
+the current frame, which settrace() doesn't do. Note that in order
+for this to work, a global tracing function must have been installed
+with settrace() in order to enable the runtime tracing machinery,
+but it doesn't need to be the same tracing function (e.g. it could be a
+low overhead tracing function that simply returns None to disable
+itself immediately on each frame).
+For more information on code and frame objects, refer to 标准类型层级结构.
+Raises an auditing event sys.settrace with no arguments.
+CPython implementation detail: The settrace() function is intended only for implementing debuggers,
+profilers, coverage tools and the like.  Its behavior is part of the
+implementation platform, rather than part of the language definition, and
+thus may not be available in all Python implementations.
+在 3.7 版更改: 'opcode' event type added; f_trace_lines and
+f_trace_opcodes attributes added to frames
+Accepts two optional keyword arguments which are callables that accept an
+asynchronous generator iterator as an argument. The firstiter
+callable will be called when an asynchronous generator is iterated for the
+first time. The finalizer will be called when an asynchronous generator
+is about to be garbage collected.
+Raises an auditing event sys.set_asyncgen_hooks_firstiter with no arguments.
+Raises an auditing event sys.set_asyncgen_hooks_finalizer with no arguments.
+Two auditing events are raised because the underlying API consists of two
+calls, each of which must raise its own event.
+3.6 新版功能: See PEP 525 for more details, and for a reference example of a
+finalizer method see the implementation of
+asyncio.Loop.shutdown_asyncgens in
+Lib/asyncio/base_events.py
+注解
+本函数已添加至暂定软件包（详情请参阅 PEP 411 ）。
+Allows enabling or disabling coroutine origin tracking. When
+enabled, the cr_origin attribute on coroutine objects will
+contain a tuple of (filename, line number, function name) tuples
+describing the traceback where the coroutine object was created,
+with the most recent call first. When disabled, cr_origin will
+be None.
+To enable, pass a depth value greater than zero; this sets the
+number of frames whose information will be captured. To disable,
+pass set depth to zero.
+This setting is thread-specific.
+3.7 新版功能.
+注解
+本函数已添加至暂定软件包（详情请参阅 PEP 411 ）。仅将其用于调试目的。
+Changes the default filesystem encoding and errors mode to 'mbcs' and
+'replace' respectively, for consistency with versions of Python prior to 3.6.
+This is equivalent to defining the PYTHONLEGACYWINDOWSFSENCODING
+environment variable before launching Python.
+可用性: Windows。
+3.6 新版功能: 有关更多详细信息，请参阅 PEP 529。
+File objects used by the interpreter for standard
+input, output and errors:
+stdin is used for all interactive input (including calls to
+input());
+stdout is used for the output of print() and expression
+statements and for the prompts of input();
+The interpreter's own prompts and its error messages go to stderr.
+These streams are regular text files like those
+returned by the open() function.  Their parameters are chosen as
+follows:
+The character encoding is platform-dependent.  Non-Windows
+platforms use the locale encoding (see
+locale.getpreferredencoding()).
+On Windows, UTF-8 is used for the console device.  Non-character
+devices such as disk files and pipes use the system locale
+encoding (i.e. the ANSI codepage).  Non-console character
+devices such as NUL (i.e. where isatty() returns True) use the
+value of the console input and output codepages at startup,
+respectively for stdin and stdout/stderr. This defaults to the
+system locale encoding if the process is not initially attached
+to a console.
+The special behaviour of the console can be overridden
+by setting the environment variable PYTHONLEGACYWINDOWSSTDIO
+before starting Python. In that case, the console codepages are
+used as for any other character device.
+Under all platforms, you can override the character encoding by
+setting the PYTHONIOENCODING environment variable before
+starting Python or by using the new -X utf8 command
+line option and PYTHONUTF8 environment variable.  However,
+for the Windows console, this only applies when
+PYTHONLEGACYWINDOWSSTDIO is also set.
+When interactive, stdout and stderr streams are line-buffered.
+Otherwise, they are block-buffered like regular text files.  You can
+override this value with the -u command-line option.
+注解
+To write or read binary data from/to the standard streams, use the
+underlying binary buffer object.  For example, to
+write bytes to stdout, use sys.stdout.buffer.write(b'abc').
+However, if you are writing a library (and do not control in which
+context its code will be executed), be aware that the standard streams
+may be replaced with file-like objects like io.StringIO which
+do not support the buffer attribute.
+These objects contain the original values of stdin, stderr and
+stdout at the start of the program.  They are used during finalization,
+and could be useful to print to the actual standard stream no matter if the
+sys.std* object has been redirected.
+It can also be used to restore the actual files to known working file objects
+in case they have been overwritten with a broken object.  However, the
+preferred way to do this is to explicitly save the previous stream before
+replacing it, and restore the saved object.
+注解
+Under some conditions stdin, stdout and stderr as well as the
+original values __stdin__, __stdout__ and __stderr__ can be
+None. It is usually the case for Windows GUI apps that aren't connected
+to a console and Python apps started with pythonw.
+A named tuple holding information about the thread
+implementation.
+属性
+说明
+name
+线程实现的名称：
+'nt': Windows 线程
+'pthread': POSIX 线程
+'solaris': Solaris 线程
+lock
+锁实现的名称：
+'semaphore': 锁使用信号量
+'mutex+cond': 锁使用互斥和条件变量
+None 如果此信息未知
+version
+线程库的名称和版本。它是一个字符串，如果此信息未知，则为 None 。
+3.3 新版功能.
+When this variable is set to an integer value, it determines the maximum number
+of levels of traceback information printed when an unhandled exception occurs.
+The default is 1000.  When set to 0 or less, all traceback information
+is suppressed and only the exception type and value are printed.
+Handle an unraisable exception.
+Called when an exception has occurred but there is no way for Python to
+handle it. For example, when a destructor raises an exception or during
+garbage collection (gc.collect()).
+The unraisable argument has the following attributes:
+exc_type: 异常类型
+exc_value: 异常值，可以是 None.
+exc_traceback: 异常回溯，可以是 None.
+err_msg: 错误信息，可以是 None.
+object: 导致异常的对象，可以为 None.
+The default hook formats err_msg and object as:
+f'{err_msg}: {object!r}'; use "Exception ignored in" error message
+if err_msg is None.
+sys.unraisablehook() can be overridden to control how unraisable
+exceptions are handled.
+使用定制钩子存放 exc_value 可能会创建引用循环。 它应当在不再需要异常时被显式地清空以打破引用循环。
+Storing object using a custom hook can resurrect it if it is set to an
+object which is being finalized. Avoid storing object after the custom
+hook completes to avoid resurrecting objects.
+See also excepthook() which handles uncaught exceptions.
+
+Raise an auditing event sys.unraisablehook with arguments
+hook, unraisable when an exception that cannot be handled occurs.
+The unraisable object is the same as what will be passed to the hook.
+If no hook has been set, hook may be None.
+3.8 新版功能.
+A string containing the version number of the Python interpreter plus additional
+information on the build number and compiler used.  This string is displayed
+when the interactive interpreter is started.  Do not extract version information
+out of it, rather, use version_info and the functions provided by the
+platform module.
+这个解释器的 C API 版本。当你在调试 Python及期扩展模板的版本冲突这个功能非常有用。
+A tuple containing the five components of the version number: major, minor,
+micro, releaselevel, and serial.  All values except releaselevel are
+integers; the release level is 'alpha', 'beta', 'candidate', or
+'final'.  The version_info value corresponding to the Python version 2.0
+is (2, 0, 0, 'final', 0).  The components can also be accessed by name,
+so sys.version_info[0] is equivalent to sys.version_info.major
+and so on.
+在 3.1 版更改: Added named component attributes.
+This is an implementation detail of the warnings framework; do not modify this
+value.  Refer to the warnings module for more information on the warnings
+framework.
+The version number used to form registry keys on Windows platforms. This is
+stored as string resource 1000 in the Python DLL.  The value is normally the
+first three characters of version.  It is provided in the sys
+module for informational purposes; modifying this value has no effect on the
+registry keys used by Python.
+可用性: Windows。
+A dictionary of the various implementation-specific flags passed through
+the -X command-line option.  Option names are either mapped to
+their values, if given explicitly, or to True.  Example:
+CPython implementation detail: This is a CPython-specific way of accessing options passed through
+-X.  Other implementations may export them through other
+means, or not at all.
+3.2 新版功能.
+Citations
+ISO/IEC 9899:1999.  "Programming languages -- C."  A public draft of this standard is available at http://www.open-std.org/jtc1/sc22/wg14/www/docs/n1256.pdf.
+Python运行时服务
+sysconfig --- Provide access to Python's configuration information
+</body></doc>

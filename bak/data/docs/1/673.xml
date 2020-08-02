@@ -1,0 +1,115 @@
+<?xml version='1.0' encoding='utf-8'?>
+<doc><id>673</id><url>https://docs.python.org/zh-cn/3/license.html</url><title>历史和许可证</title><body>Python 由荷兰数学和计算机科学研究学会（CWI，见 https://www.cwi.nl/ ）的 Guido van Rossum 于 1990 年代初设计，作为一门叫做 ABC 的语言的替代品。尽管 Python 包含了许多来自其他人的贡献，Guido 仍是其主要作者。
+1995 年，Guido 在弗吉尼亚州的国家创新研究公司（CNRI，见 https://www.cnri.reston.va.us/ ）继续他在 Python 上的工作，并在那里发布了该软件的多个版本。
+2000 年五月，Guido 和 Python 核心开发团队转到 BeOpen.com 并组建了 BeOpen PythonLabs 团队。 同年十月，PythonLabs 团队转到 Digital Creations (现为 Zope Corporation；见 https://www.zope.org/)。 2001 年，Python 软件基金会 (PSF，见 https://www.python.org/psf/) 成立，这是一个专为拥有 Python 相关知识产权而创建的非营利组织。 Zope Corporation 现在是 PSF 的赞助成员。
+所有的 Python 版本都是开源的（有关开源的定义参阅 https://opensource.org/ ）。历史上，绝大多数 Python 版本是 GPL 兼容的；下表总结了各个版本情况。
+发布版本
+源自
+年份
+所有者
+GPL 兼容？
+0.9.0 至 1.2
+n/a
+1991-1995
+CWI
+是
+1.3 至 1.5.2
+1.2
+1995-1999
+CNRI
+是
+1.6
+1.5.2
+2000
+CNRI
+否
+2.0
+1.6
+2000
+BeOpen.com
+否
+1.6.1
+1.6
+2001
+CNRI
+否
+2.1
+2.0+1.6.1
+2001
+PSF
+否
+2.0.1
+2.0+1.6.1
+2001
+PSF
+是
+2.1.1
+2.1+2.0.1
+2001
+PSF
+是
+2.1.2
+2.1.1
+2002
+PSF
+是
+2.1.3
+2.1.2
+2002
+PSF
+是
+2.2 及更高
+2.1.1
+2001 至今
+PSF
+是
+注解
+GPL 兼容并不意味着 Python 在 GPL 下发布。与 GPL 不同，所有 Python 许可证都允许您分发修改后的版本，而无需开源所做的更改。GPL 兼容的许可证使得 Python 可以与其它在 GPL 下发布的软件结合使用；但其它的许可证则不行。
+感谢众多在 Guido 指导下工作的外部志愿者，使得这些发布成为可能。
+BEOPEN PYTHON 开源许可协议第 1 版
+本节是Python发行版中收录的第三方软件的许可和致谢清单，该清单是不完整且不断增长的。
+_random 模块包含基于 http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/MT2002/emt19937ar.html 下载的代码。以下是原始代码的完整注释（声明）：
+socket 模块使用 getaddrinfo() 和 getnameinfo() 函数，这些函数源代码在WIDE项目（http://www.wide.ad.jp/）的单独源文件中。
+asynchat 和 asyncore 模块包含以下声明:
+http.cookies 模块包含以下声明:
+trace 模块包含以下声明:
+uu 模块包含以下声明:
+xmlrpc.client 模块包含以下声明:
+test_epoll 模块包含以下声明:
+select 模块关于 kqueue 的接口包含以下声明:
+Python/pyhash.c 文件包含 Marek Majkowski' 对 Dan Bernstein 的SipHash24 算法的实现。它包含以下声明:
+Python/dtoa.c 文件提供了C语言的 dtoa 和 strtod 函数，用于将C语言的 双精度型和字符串进行转换，由David M. Gay的同名文件派生而来，该文件当前可从http://www.netlib.org/fp/ 下载。2009年3月16日检索到的原始文件包含以下版权和许可声明:
+如果操作系统可用，则 hashlib, posix, ssl, crypt 模块使用OpenSSL库来提高性能。此外，适用于Python的Windows和Mac OS X安装程序可能包括OpenSSL库的拷贝，所以在此处也列出了OpenSSL许可证的拷贝:
+除非使用 --with-system-expat 配置了构建，否则 pyexpat 扩展都是用包含 expat源的拷贝构建的:
+除非使用 --with-system-libffi 配置了构建，否则 _ctypes 扩展都是包含 libffi源的拷贝构建的:
+如果系统上找到的zlib版本太旧而无法用于构建，则使用包含 zlib源代码的拷贝来构建 zlib 扩展:
+tracemalloc 使用的哈希表的实现基于 cfuhash项目:
+除非使用 --with-system-libmpdec 配置了构建，否则 _decimal 模块都是用包含 libmpdec 库的拷贝构建的。
+test 包（lib/test/xmltestdata/c14n-20/）中的 C14N2.0测试套件来源于W3C网站 https://www.w3.org/TR/xml-c14n2-testcases/ ，并根据 BSD许可证（三条款版）发行：
+Copyright (c) 2013 W3C(R) (MIT, ERCIM, Keio, Beihang),
+All Rights Reserved.
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+Redistributions of works must retain the original copyright notice,
+this list of conditions and the following disclaimer.
+Redistributions in binary form must reproduce the original copyright
+notice, this list of conditions and the following disclaimer in the
+documentation and/or other materials provided with the distribution.
+Neither the name of the W3C nor the names of its contributors may be
+used to endorse or promote products derived from this work without
+specific prior written permission.
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+版权所有
+分发 Python 模块（遗留版本）
+</body></doc>

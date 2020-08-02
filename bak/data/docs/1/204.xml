@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<doc><id>204</id><url>https://docs.python.org/zh-cn/3/library/__main__.html</url><title> --- 顶层脚本环境</title><body>'__main__' 是顶层代码执行的作用域的名称。模块的 __name__ 在通过标准输入、脚本文件或是交互式命令读入的时候会等于 '__main__'。
+模块可以通过检查自己的 __name__ 来得知是否运行在 main 作用域中，这使得模块可以在作为脚本或是通过 python -m 运行时条件性地执行一些代码，而在被 import 时不会执行。
+对软件包来说，通过加入 __main__.py 模块可以达到同样的效果，当使用 -m 运行模块时，其中的代码会被执行。
+builtins --- 内建对象
+warnings --- Warning control
+</body></doc>

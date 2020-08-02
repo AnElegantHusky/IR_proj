@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='utf-8'?>
+<doc><id>762</id><url>https://docs.python.org/zh-cn/3/library/language.html</url><title>Python 语言服务</title><body>Python 提供了许多模块来帮助使用 Python 语言。 这些模块支持标记化、解析、语法分析、字节码反汇编以及各种其他工具。
+这些模块包括：
+Using importlib.metadata
+parser --- 访问 Python 解析树
+</body></doc>

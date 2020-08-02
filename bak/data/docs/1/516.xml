@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<doc><id>516</id><url>https://docs.python.org/zh-cn/3/library/ipc.html</url><title>网络和进程间通信</title><body>本章介绍的模块提供了网络和进程间通信的机制。
+某些模块仅适用于同一台机器上的两个进程，例如 signal 和 mmap 。 其他模块支持两个或多个进程可用于跨机器通信的网络协议。
+本章中描述的模块列表是：
+contextvars 上下文变量
+asyncio --- 异步 I/O
+</body></doc>

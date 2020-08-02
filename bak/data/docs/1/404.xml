@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='utf-8'?>
+<doc><id>404</id><url>https://docs.python.org/zh-cn/3/library/concurrency.html</url><title>并发执行</title><body>本章中描述的模块支持并发执行代码。 适当的工具选择取决于要执行的任务（CPU密集型或IO密集型）和偏好的开发风格（事件驱动的协作式多任务或抢占式多任务处理）。 这是一个概述：
+以下是上述某些服务的支持模块：
+ctypes --- Python 的外部函数库
+threading --- 基于线程的并行
+</body></doc>

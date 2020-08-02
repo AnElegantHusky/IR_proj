@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='utf-8'?>
+<doc><id>616</id><url>https://docs.python.org/zh-cn/3/c-api/method.html</url><title>实例方法对象</title><body>实例方法是 PyCFunction 的包装器，也是将 PyCFunction 绑定到类对象的一种新方式。 它替代了原先的调用 PyMethod_New(func, NULL, class)。
+这个 PyTypeObject 实例代表 Python 实例方法类型。 它并不对 Python 程序公开。
+如果 o 是实例方法对象 (类型为 PyInstanceMethod_Type) 则返回真值。 形参必须不为 NULL。
+返回一个新的实例方法对象，func 应为任意可调用对象，func 将在实例方法被调用时作为函数被调用。
+返回关联到实例方法 im 的函数对象。
+宏版本的 PyInstanceMethod_Function()，略去了错误检测。
+方法是绑定的函数对象。 方法总是会被绑定到一个用户自定义类的实例。 未绑定方法（绑定到一个类的方法）已不再可用。
+这个 PyTypeObject 实例代表 Python 方法类型。 它作为 types.MethodType 向 Python 程序公开。
+如果 o 是方法对象 (类型为 PyMethod_Type) 则返回真值。 形参必须不为 NULL。
+返回一个新的方法对象，func 应为任意可调用对象，self 为该方法应绑定的实例。 在方法被调用时 func 将作为函数被调用。 self 必须不为 NULL。
+返回关联到方法 meth 的函数对象。
+宏版本的 PyMethod_Function()，略去了错误检测。
+返回关联到方法 meth 的实例。
+宏版本的 PyMethod_Self()，略去了错误检测。
+清空释放列表。 返回所释放的条目数。
+函数对象
+Cell 对象
+</body></doc>

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<doc><id>511</id><url>https://docs.python.org/zh-cn/3/library/development.html</url><title>开发工具</title><body>本章中描述的各模块可帮你编写 Python 程序。例如，pydoc 模块接受一个模块并根据该模块的内容来生成文档。doctest 和 unittest 这两个模块包含了用于编写单元测试的框架，并可用于自动测试所编写的代码，验证预期的输出是否产生。2to3 程序能够将 Python 2.x 源代码翻译成有效的 Python 3.x 源代码。
+本章中描述的模块列表是：
+另请参看 Python 开发模式: -X dev 选项以及 PYTHONDEVMODE 环境变量。
+其他图形用户界面（GUI）包
+typing --- 类型标注支持
+</body></doc>

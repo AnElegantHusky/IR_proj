@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='utf-8'?>
+<doc><id>396</id><url>https://docs.python.org/zh-cn/3/library/filesys.html</url><title>文件和目录访问</title><body>本章中描述的模块处理磁盘文件和目录。 例如，有一些模块用于读取文件的属性，以可移植的方式操作路径以及创建临时文件。 本章的完整模块列表如下：
+参见
+操作系统接口，包括处理比 Python 文件对象 更低级别文件的功能。
+Python的内置 I/O 库，包括抽象类和一些具体的类，如文件 I/O 。
+使用 Python 打开文件进行读写的标准方法。
+operator --- 标准运算符替代函数
+pathlib --- 面向对象的文件系统路径
+</body></doc>

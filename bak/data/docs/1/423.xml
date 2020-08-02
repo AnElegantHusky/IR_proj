@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='utf-8'?>
+<doc><id>423</id><url>https://docs.python.org/zh-cn/3/library/persistence.html</url><title>数据持久化</title><body>本章中描述的模块支持在磁盘上以持久形式存储 Python 数据。 pickle 和 marshal 模块可以将许多 Python 数据类型转换为字节流，然后从字节中重新创建对象。 各种与 DBM 相关的模块支持一系列基于散列的文件格式，这些格式存储字符串到其他字符串的映射。
+本章中描述的模块列表是：
+shutil --- 高阶文件操作
+pickle --- Python 对象序列化
+</body></doc>

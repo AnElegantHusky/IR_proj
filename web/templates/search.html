@@ -37,15 +37,16 @@
             </form>
         </div>
         <hr/>
-        {% block high_search%}
-        {% endblock %}
+{#        {% block high_search%}#}
+{#        {% endblock %}#}
         {% if error%}
             {% for doc in docs%}
             <div id="doc">
                 <ul id="navigation">
-                    <p><big><a href="/search/{{doc.id}}/" target="_blank">{{doc.title}}</a></big></p>
-                    <p>{{doc.time}}<br/>{{doc.snippet}}<br/>
-                    <a href="{{ doc.url }}" target="_blank">{{doc.url}}</a>
+                    <p>
+                        <p><big><a href="/search/{{doc._id}}/" target="_blank">{{doc._source.title}}</a></big></p>
+                        <br/>{{doc._source.body[0:150]}}<br/>
+                        <a href="{{ doc._source.url }}" target="_blank">{{doc._source.url}}</a>
                     </p>
                 </ul>
             </div>
@@ -53,7 +54,7 @@
             {% endfor %}
         {% block next %}
         <ul>
-            {% for i in page %}
+            {% for i in range(1, page) %}
                 <a href="/search/page/{{i}}/">{{i}}</a>&nbsp;
             {% endfor %}
         </ul>

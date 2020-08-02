@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='utf-8'?>
+<doc><id>465</id><url>https://docs.python.org/zh-cn/3/c-api/allocation.html</url><title>在堆上分配对象</title><body>用它的类型和初始引用来初始化新分配对象 op。返回已初始化对象。如果 type 表明该对象参与循环垃圾检测器，则将其添加到检测器的观察对象集中。 对象的其他字段不受影响。
+它的功能和 PyObject_Init() 一样，并且会初始化变量大小对象的长度信息。
+使用 C 结构类型 TYPE 和 Python 类型对象 type 分配一个新的 Python 对象。 未在该 Python 对象标头中定义的字段不会被初始化；对象的引用计数将为一。 内存分配大小由 type 对象的 tp_basicsize 字段来确定。
+使用C的数据结构类型 TYPE 和Python的类型对象 type 分配一个新的Python对象。Python对象头文件中没有定义的字段不会被初始化。被分配的内存空间预留了 TYPE 结构加 type 对象中 tp_itemsize 字段提供的 size 字段的值。这对于实现类似元组这种能够在构造期决定自己大小的对象是很实用的。将字段的数组嵌入到相同的内存分配中可以减少内存分配的次数，这提高了内存分配的效率。
+释放由 PyObject_New() 或者 PyObject_NewVar() 分配内存的对象。这通常由对象的type字段定义的 tp_dealloc 处理函数来调用。调用这个函数以后op对象中的字段都不可以被访问，因为原分配的内存空间已不再是一个有效的Python对象。
+这个对象是像 None 一样的 Python 对象。它可以使用 Py_None 宏访问，该宏的拿到指向该对象的指针。
+参见
+分配内存和创建扩展模块
+对象实现支持
+Common Object Structures
+</body></doc>

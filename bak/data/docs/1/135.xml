@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='utf-8'?>
+<doc><id>135</id><url>https://docs.python.org/zh-cn/3/library/modulefinder.html</url><title> --- 查找脚本使用的模块</title><body>源码： Lib/modulefinder.py
+该模块提供了一个 ModuleFinder 类，可用于确定脚本导入的模块集。 modulefinder.py 也可以作为脚本运行，给出 Python 脚本的文件名作为参数，之后将打印导入模块的报告。
+记录名为 pkg_name 的包可以在指定的 path 中找到。
+允许指定名为 oldname 的模块实际上是名为 newname 的包。
+该类提供 run_script() 和 report() 方法，用于确定脚本导入的模块集。 path 可以是搜索模块的目录列表；如果没有指定，则使用 sys.path 。  debug 设置调试级别；更高的值使类打印调试消息，关于它正在做什么。 excludes 是要从分析中排除的模块名称列表。 replace_paths 是将在模块路径中替换的 (oldpath, newpath) 元组的列表。
+将报告打印到标准输出，列出脚本导入的模块及其路径，以及缺少或似乎缺失的模块。
+分析 pathname 文件的内容，该文件必须包含 Python 代码。
+一个将模块名称映射到模块的字典。 请参阅 ModuleFinder 的示例用法。
+稍后将分析的脚本（bacon.py）:
+将输出 bacon.py 报告的脚本:
+输出样例（可能因架构而异）:
+pkgutil --- 包扩展工具
+runpy --- Locating and executing Python modules
+</body></doc>
