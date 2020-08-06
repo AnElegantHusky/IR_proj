@@ -14,9 +14,16 @@ from engine.elasticsearch_orm import engineMiddleware
 
 
 class EnginePipeline(object):
+    def __init__(self):
+        self.index = open('../index.txt', 'a+')
+
     def process_item(self, item, spider):
+        self.index.write("{}\n".format(item['url']))
         item.save_to_es()
         return item
+
+    def close_spider(self, spider):
+        self.index.close()
 
 
 class DocumentationPythonPipeline:

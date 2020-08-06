@@ -1,19 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>{{doc.title}}</title>
+    <title>{{title}}</title>
 </head>
 <body>
     <div id="basic" align="center">
-        <h1>{{doc.title}}</h1>
+        <h1>{{title}}</h1>
 {#        <p>{{doc.datetime}}</p>#}
-        <p><a href="{{doc.url}}" target="_blank">{{doc.url}}</a></p>
+        <p><a href="{{url}}" target="_blank">{{url}}</a></p>
     </div>
     <hr/>
     <div id="detail" align="center">
         <table width="1000" border="0">
             <tr>
-                <td style="width:1000px"><p>{{doc.body}}</p></td>
+{#                {{ doc.body }}#}
+{#                <td style="width:1000px"><p>{{doc.body}}</p></td>#}
+                {% for para in text %}
+                    <p style="width:1000px;text-align:left;">{{ para }}</p>
+                {% endfor %}
             </tr>
         </table>
     </div>
